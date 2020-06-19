@@ -1,0 +1,24 @@
+{
+  "name": "survey",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha dist/Survey/Test",
+    "testDot": "mocha dist/Survey/Test --reporter dot",
+    "start": "node ./dist/Survey/index.js",
+    "build": "rm -rf ../../dist/Survey && tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+  },
+  "author": "Roman Schmidt",
+  "license": "ISC",
+  "mocha": {
+    "ui": "bdd",
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ]
+  }
+}
