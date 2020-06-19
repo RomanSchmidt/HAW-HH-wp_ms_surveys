@@ -1,6 +1,7 @@
 import AObject from "./AObject";
 import AController from "./AController";
 import * as express from "express";
+import ErrorHandler from "./ErrorHandler";
 import compression = require("compression");
 import morgan = require("morgan");
 import bodyParser = require("body-parser");
@@ -13,7 +14,7 @@ export default class App extends AObject {
     private readonly _express: express.Express = express();
     private readonly _routes: { [key: string]: express.Router } = {};
 
-    //private _errorHandler: ErrorHandler;
+    private _errorHandler: ErrorHandler = new ErrorHandler();
 
     public constructor() {
         super();
@@ -44,9 +45,9 @@ export default class App extends AObject {
                     .then(result => {
                         res.status(200).json({error: null, success: result});
                     })
-                    // @todo add error handling
-                    .catch(err => {
-                        res.status(400).json({error: err, success: null});
+                    .catch((err: Error) => {
+                        const {status, message} = this._errorHandler.analyze(err);
+                        res.status(status).json({error: message, success: null});
                     })
                 ;
             });
@@ -76,8 +77,6 @@ export default class App extends AObject {
         this._express.use(bodyParser.urlencoded({extended: false}));
         this._express.use(bodyParser.json({limit: 10 * 1024 * 1024}));
         this._express.use(helmet());
-        // @todo use error handler
-        //this._errorHandler = new ErrorHandler();
     }
 
     private _initCores(): void {
