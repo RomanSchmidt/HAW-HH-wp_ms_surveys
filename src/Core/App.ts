@@ -2,6 +2,7 @@ import AObject from "./AObject";
 import AController from "./AController";
 import * as express from "express";
 import ErrorHandler from "./ErrorHandler";
+import {Db} from "./Db";
 import compression = require("compression");
 import morgan = require("morgan");
 import bodyParser = require("body-parser");
@@ -24,26 +25,33 @@ export default class App extends AObject {
     /**
      * @todo make port configurable
      */
-    public start(): void {
+    public async start(): Promise<void> {
         this._registerRouters();
         this._initErrorHandle();
-        this._express.listen(8080, () => {
-            this.log('server has started on', 8080);
+        this._express.listen(8081, () => {
+            this.log('server has started on', 8081);
         });
+        const db = new Db();
+        return db.init();
     }
 
     public async addController(controller: AController) {
+        await controller.init();
         const router = this._getRouter(controller.getPath());
-        for (const actionName in controller.get) {
-            this.log('adding route', 'GET', controller.getPath(), actionName);
+        for (let actionName in controller.get) {
+            const functionName = actionName;
+            if (actionName == 'index') {
+                actionName = '';
+            }
+            this.log('adding route', 'GET-> /' + controller.getPath() + '/' + actionName);
             router.get('/' + actionName, (req, res) => {
-                controller.get[actionName]({
+                controller.get[functionName]({
                     body: req.body,
                     params: req.params,
                     query: req.query
                 })
                     .then(result => {
-                        res.status(200).json({error: null, success: result});
+                        res.status(200).json({error: null, success: result || null});
                     })
                     .catch((err: Error) => {
                         const {status, message} = this._errorHandler.analyze(err);

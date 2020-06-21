@@ -3,8 +3,8 @@ import Controller from "./Controller";
 
 const app = new App();
 app.addController(new Controller())
-    .then(() => {
-        app.start();
+    .then(async () => {
+        await app.start();
     })
     .catch((err) => {
         console.error(err);

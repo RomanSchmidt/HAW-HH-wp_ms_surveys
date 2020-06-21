@@ -21,7 +21,7 @@ export default class LogManager {
             '[',
             Tools.formatTime(Date.now(), true),
             '] ',
-            (stack.split('\n')[4]?.replace(/^.+[\\\/]src([\\\/])([^\)]+)\)/i, '.$1$2') || ''),
+            (stack.split('\n')[4]?.replace(/^\W+/, '')) || 'unknown position',
             ' ->'
         ].join('');
     }

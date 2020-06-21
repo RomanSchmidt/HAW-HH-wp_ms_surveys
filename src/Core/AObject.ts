@@ -7,17 +7,15 @@ export default abstract class AObject {
         this._logManager = new LogManager();
     }
 
+    public async init(): Promise<void> {
+        return;
+    }
+
     protected log(description: string, ...elemetns: any[]): void {
         this._logManager.log(description, ...elemetns);
     }
 
     protected logError(description: string, ...elemetns: any[]): void {
         this._logManager.logError(description, ...elemetns);
-    }
-
-    public async init(): Promise<void> {
-        return new Promise(() => {
-
-        });
     }
 }
