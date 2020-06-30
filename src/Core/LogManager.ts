@@ -1,4 +1,4 @@
-import Tools from "./Tools";
+import Tools from "./Helper/Tools";
 
 export default class LogManager {
     public log(description: string, ...elements: any[]): void {

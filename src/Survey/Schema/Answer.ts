@@ -1,6 +1,6 @@
 import ASchema from "../../Core/ASchema";
 import * as mongoose from "mongoose";
-import {SingletonObject} from "../../Core/Decorators/SingletonObject";
+import {SingletonObject} from "../../Core/Decorator/SingletonObject";
 
 @SingletonObject
 export default class Answer extends ASchema {

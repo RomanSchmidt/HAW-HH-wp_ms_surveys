@@ -1,7 +1,7 @@
 import ASchema from "../../Core/ASchema";
 import * as mongoose from "mongoose";
 import Answer from "./Answer";
-import {SingletonObject} from "../../Core/Decorators/SingletonObject";
+import {SingletonObject} from "../../Core/Decorator/SingletonObject";
 
 @SingletonObject
 export default class Question extends ASchema{
@@ -10,7 +10,7 @@ export default class Question extends ASchema{
     public getSchema(): mongoose.Schema {
         const schemaObject = new mongoose.Schema({
             title: String,
-            answers: new Answer().getSchema()
+            answers: [new Answer().getSchema()]
         });
 
         return schemaObject;

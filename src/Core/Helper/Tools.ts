@@ -1,6 +1,9 @@
 export default abstract class Tools {
 
-    static formatTime(dateValue: number | Date, withTime: boolean): string {
+    private constructor() {
+    }
+
+    public static formatTime(dateValue: number | Date, withTime: boolean): string {
         let
             date = new Date(dateValue),
             month = (date.getMonth() + 1).toString(),

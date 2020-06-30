@@ -4,8 +4,9 @@ import ASchema from "./ASchema";
 import {Db} from "./Db";
 import * as mongoose from "mongoose";
 import InternalServerError from "./Error/InternalServerError";
-
-type Result = { [key: string]: any };
+import {CollectionObject} from "./Declorator/CollectionObject";
+import {ErrorType} from "./Error/ErrorType";
+import BadRequest from "./Error/BadRequest";
 
 export default abstract class AModel<T extends AValidator, V extends ASchema> extends AObject {
     private readonly _validator: T;
@@ -25,7 +26,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         this._db = db.registerSchema(this._schema);
     }
 
-    public async getById<Result = {}>(
+    public async getById<Result = CollectionObject>(
         id: mongoose.Types.ObjectId,
         projection: { [key: string]: boolean }
     ): Promise<Result> {
@@ -34,7 +35,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         return <Result>object;
     }
 
-    public async getAll<Result = {}>(
+    public async getAll<Result extends CollectionObject>(
         filter: { [key: string]: typeof mongoose.Types },
         projection: { [key: string]: boolean }
     ): Promise<Result[]> {
@@ -42,31 +43,34 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         return <Result[]><any>await this._db?.find(filter, projection).lean().exec();
     }
 
-    public async updateById(id: mongoose.Types.ObjectId, body: { [key: string]: typeof mongoose.Types }): Promise<Result> {
+    public async updateById<T extends CollectionObject>(id: mongoose.Types.ObjectId, body: T): Promise<typeof body | undefined> {
         return this.update({_id: id}, body);
     }
 
-    public async update(filter: { [key: string]: any }, body: { [key: string]: typeof mongoose.Types }): Promise<Result> {
-        const cleanedBody = this._validator.verifyUpdate(body);
-        const result = await this._db?.findOneAndUpdate(filter, {$set: cleanedBody}, {
+    public async update<T extends CollectionObject>(filter: { [key: string]: any }, payload: T): Promise<typeof payload | undefined> {
+        if(this._validator.isEmpty(payload)) {
+            throw new BadRequest({field:'payload', type:ErrorType.empty});
+        }
+        const cleanedPayload = this._validator.verifyUpdate(payload);
+        const result = await this._db?.findOneAndUpdate(filter, {$set: cleanedPayload}, {
             lean: true,
             new: true,
             select: {},
             upsert: false
         });
         if (!result) {
-            throw new InternalServerError('update error: result empty');
+            return undefined;
         }
-        const returnObject: Result = {};
-        for (const i in cleanedBody) {
+        const returnObject: CollectionObject = {};
+        for (const i in cleanedPayload) {
             if (i in result) {
                 returnObject[i] = (<any>result)[i];
             }
         }
-        return returnObject;
+        return <T>returnObject;
     }
 
-    public async insert(body: { [key: string]: typeof mongoose.Types }): Promise<Result> {
+    public async insert<T extends CollectionObject>(body: T): Promise<typeof body> {
         const
             cleanedBody = this._validator.verifyInsert(body),
             result = await this._db?.create(cleanedBody, {
@@ -77,8 +81,13 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
             });
 
         if (!result) {
-            throw new InternalServerError('insert error: result empty');
+            throw new InternalServerError({field: 'insertResult', type: ErrorType.invalid});
         }
-        return result.toJSON();
+        return <T><any>result;
+    }
+
+    public async dropById(id: mongoose.Types.ObjectId): Promise<boolean> {
+        const result = await this._db?.deleteOne({_id: id});
+        return (result?.deletedCount || 0) > 0;
     }
 }

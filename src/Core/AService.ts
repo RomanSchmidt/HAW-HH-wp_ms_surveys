@@ -3,16 +3,17 @@ import AModel from "./AModel";
 import * as mongoose from "mongoose";
 import AValidator from "./AValidator";
 import ASchema from "./ASchema";
+import {CollectionObject} from "./Declorator/CollectionObject";
 
 export default abstract class AService<T extends AModel<AValidator, ASchema>> extends AObject {
-    private _model: T;
+    protected _model: T;
 
     protected constructor(model: T) {
         super();
         this._model = model;
     }
 
-    async init(): Promise<void> {
+    public async init(): Promise<void> {
         await super.init();
         await this._model.init();
     }
@@ -24,7 +25,7 @@ export default abstract class AService<T extends AModel<AValidator, ASchema>> ex
         return this._model.getById(id, projection);
     }
 
-    public async getAll<Result = {}>(
+    public async getAll<Result extends CollectionObject>(
         filter: { [key: string]: typeof mongoose.Types },
         projection: { [key: string]: boolean }
     ): Promise<Result[]> {
