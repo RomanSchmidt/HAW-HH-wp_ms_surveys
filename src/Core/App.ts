@@ -5,6 +5,9 @@ import ErrorHandler from "./ErrorHandler";
 import {Db} from "./Db";
 import Arguments from "./Helper/Arguments";
 import {Environment} from "./Declorator/Environment";
+import InternalServerError from "./Error/InternalServerError";
+import {ErrorType} from "./Error/ErrorType";
+import AForeignService from "./AForeignService";
 import compression = require("compression");
 import morgan = require("morgan");
 import bodyParser = require("body-parser");
@@ -22,38 +25,38 @@ export default class App extends AObject {
     private readonly _express: express.Express = express();
     private readonly _routes: { [key: string]: express.Router } = {};
     private _errorHandler: ErrorHandler = new ErrorHandler();
+    private readonly _controller: AController;
+    private readonly _foreignServices: AForeignService[] = [];
+    private _hasStarted: boolean = false;
 
-    public constructor() {
+    public constructor(controller: AController) {
         super();
+        this._controller = controller;
         this._initExpress();
     }
 
     public async start(): Promise<void> {
-        this._registerRouters();
-        this._initErrorHandle();
+        if (this._hasStarted) {
+            throw new InternalServerError({field: 'app start', type: ErrorType.ambiguous});
+        }
+        this._hasStarted = true;
+        await this.init();
+    }
+
+    public async init(): Promise<void> {
+        await super.init();
+        await this._registerRouter();
         const port = Arguments.get('PORT').PORT || 8080;
         this._express.listen(port, () => {
             this.log('server has started on', port);
         });
         const db = new Db();
-        return db.init();
+        await db.init();
+        await this._initForeignServices();
     }
 
-    public async addController(controller: AController) {
-        await controller.init();
-
-        for (let actionName in controller.get) {
-            this._registerMethod('get', controller, actionName);
-        }
-        for (let actionName in controller.post) {
-            this._registerMethod('post', controller, actionName);
-        }
-        for (let actionName in controller.put) {
-            this._registerMethod('put', controller, actionName);
-        }
-        for (let actionName in controller.delete) {
-            this._registerMethod('delete', controller, actionName);
-        }
+    public addForeignService(service: AForeignService): void {
+        this._foreignServices.push(service);
     }
 
     private _registerMethod(method: 'get' | 'put' | 'post' | 'delete', controller: AController, actionName: string): void {
@@ -140,9 +143,39 @@ export default class App extends AObject {
         });
     }
 
-    private _registerRouters() {
+    private async _registerRouter(): Promise<void> {
+        if (!this._controller) {
+            throw new InternalServerError({field: 'controller', type: ErrorType.empty});
+        }
+        await this._controller.init();
+
+        for (let actionName in this._controller.get) {
+            this._registerMethod('get', this._controller, actionName);
+        }
+        for (let actionName in this._controller.post) {
+            this._registerMethod('post', this._controller, actionName);
+        }
+        for (let actionName in this._controller.put) {
+            this._registerMethod('put', this._controller, actionName);
+        }
+        for (let actionName in this._controller.delete) {
+            this._registerMethod('delete', this._controller, actionName);
+        }
+
         for (const routerName in this._routes) {
             this._express.use('/' + routerName, this._routes[routerName]);
         }
+
+        // @note need to be called at the end!!!
+        this._initErrorHandle();
+    }
+
+    private async _initForeignServices(): Promise<void> {
+        if (!this._foreignServices.length) {
+            return;
+        }
+        const initList: Promise<void>[] = [];
+        this._foreignServices.forEach(service => initList.push(service.init()));
+        await Promise.all(initList);
     }
 }

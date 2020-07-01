@@ -1,10 +1,10 @@
 import App from "../Core/App";
 import Controller from "./Controller";
 
-const app = new App();
-app.addController(new Controller())
+const app = new App(new Controller());
+app.start()
     .then(async () => {
-        await app.start();
+        console.log('opinion microservice has started');
     })
     .catch((err) => {
         console.error(err);

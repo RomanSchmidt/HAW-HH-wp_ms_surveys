@@ -1,10 +1,12 @@
 import App from "../Core/App";
 import Controller from "./Controller";
+import Opinion from "./Foreign/Opinion";
 
-const app = new App();
-app.addController(new Controller())
+const app = new App(new Controller());
+app.addForeignService(new Opinion());
+app.start()
     .then(async () => {
-        await app.start();
+        console.info('survey micro service has started');
     })
     .catch((err) => {
         console.error(err);

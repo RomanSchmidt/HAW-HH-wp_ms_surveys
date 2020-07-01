@@ -15,7 +15,6 @@ export default class ErrorHandler extends AObject {
             return {status: error.getStatus(), message: error.getMessage()};
         }
         if(App.ENVIRONMENT == Environment.Development) {
-            this.log('wtf', error)
             throw error;
         }
         return {

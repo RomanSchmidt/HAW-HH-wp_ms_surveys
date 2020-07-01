@@ -5,11 +5,20 @@ import {CollectionObject} from "../Core/Declorator/CollectionObject";
 import {ObjectId} from "mongodb";
 import BadRequest from "../Core/Error/BadRequest";
 import {ErrorType} from "../Core/Error/ErrorType";
+import Opinion from "./Foreign/Opinion";
+import * as mongoose from "mongoose";
 
 @SingletonObject
 export default class Service extends AService<Model> {
     constructor() {
         super(new Model());
+    }
+
+    async getById<Result = {}>(id: mongoose.Types.ObjectId, projection: { [p: string]: boolean }): Promise<Result> {
+        const result = await super.getById<Result & { opinions?: CollectionObject[] }>(id, projection);
+        const opinions = await new Opinion();
+        result['opinions'] = await opinions.get.forSurvey(id);
+        return result;
     }
 
     public async create<T extends CollectionObject>(body: T): Promise<T> {
