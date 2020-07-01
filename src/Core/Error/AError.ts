@@ -9,6 +9,7 @@ export default abstract class AError extends Error {
     constructor(message: ErrorMessage | ErrorContainer) {
         super();
         this._message = Array.isArray(message) ? message : [message];
+        this.message = JSON.stringify(this.getMessage());
     }
 
     public getStatus(): number {

@@ -11,7 +11,7 @@ import BadRequest from "./Error/BadRequest";
 export default abstract class AModel<T extends AValidator, V extends ASchema> extends AObject {
     private readonly _validator: T;
     private readonly _schema: V;
-    private _db: mongoose.Model<mongoose.Document> | undefined;
+    private _db: mongoose.Model<mongoose.Document> = <any>undefined;
 
     protected constructor(validator: T, schema: V) {
         super();
@@ -26,12 +26,16 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         this._db = db.registerSchema(this._schema);
     }
 
+    public getDb(): mongoose.Model<mongoose.Document> | undefined {
+        return this._db;
+    }
+
     public async getById<Result = CollectionObject>(
         id: mongoose.Types.ObjectId,
         projection: { [key: string]: boolean }
     ): Promise<Result> {
 
-        const object = <any>await this._db?.findOne({_id: id}, projection).lean().exec();
+        const object = <any>await this._db.findOne({_id: id}, projection).lean().exec();
         return <Result>object;
     }
 
@@ -40,7 +44,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         projection: { [key: string]: boolean }
     ): Promise<Result[]> {
 
-        return <Result[]><any>await this._db?.find(filter, projection).lean().exec();
+        return <Result[]><any>await this._db.find(filter, projection).lean().exec();
     }
 
     public async updateById<T extends CollectionObject>(id: mongoose.Types.ObjectId, body: T): Promise<typeof body | undefined> {
@@ -48,11 +52,11 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     }
 
     public async update<T extends CollectionObject>(filter: { [key: string]: any }, payload: T): Promise<typeof payload | undefined> {
-        if(this._validator.isEmpty(payload)) {
-            throw new BadRequest({field:'payload', type:ErrorType.empty});
+        if (this._validator.isEmpty(payload)) {
+            throw new BadRequest({field: 'payload', type: ErrorType.empty});
         }
         const cleanedPayload = this._validator.verifyUpdate(payload);
-        const result = await this._db?.findOneAndUpdate(filter, {$set: cleanedPayload}, {
+        const result = await this._db.findOneAndUpdate(filter, {$set: cleanedPayload}, {
             lean: true,
             new: true,
             select: {},
@@ -73,21 +77,16 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     public async insert<T extends CollectionObject>(body: T): Promise<typeof body> {
         const
             cleanedBody = this._validator.verifyInsert(body),
-            result = await this._db?.create(cleanedBody, {
-                lean: true,
-                new: true,
-                select: {},
-                upsert: false
-            });
+            result = await this._db.create(cleanedBody);
 
         if (!result) {
             throw new InternalServerError({field: 'insertResult', type: ErrorType.invalid});
         }
-        return <T><any>result;
+        return result.toJSON();
     }
 
     public async dropById(id: mongoose.Types.ObjectId): Promise<boolean> {
-        const result = await this._db?.deleteOne({_id: id});
+        const result = await this._db.deleteOne({_id: id});
         return (result?.deletedCount || 0) > 0;
     }
 }

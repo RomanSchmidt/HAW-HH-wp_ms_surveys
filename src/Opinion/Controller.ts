@@ -13,9 +13,10 @@ export default class Controller extends AController {
     private _validator: Validator = new Validator();
     public readonly put = {
         ':id': async (income: ControllerIncome): Promise<{}> => {
-            if (this._validator.convertMongoIdString(income.params.id)) {
+            const id = this._validator.convertMongoIdString(income.params.id);
+            if (id) {
                 const body = this._validator.verifyInsertExternal(income.body);
-                return this._service.create(body);
+                return this._service.update(id, body);
             }
             throw new BadRequest({field: 'id', type: ErrorType.invalid});
         }

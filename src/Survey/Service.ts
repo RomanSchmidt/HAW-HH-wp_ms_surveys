@@ -12,11 +12,11 @@ export default class Service extends AService<Model> {
         super(new Model());
     }
 
-    public async create(body: CollectionObject): Promise<CollectionObject> {
+    public async create<T extends CollectionObject>(body: T): Promise<T> {
         return this._model.insert(body);
     }
 
-    public async update(id: ObjectId, body: CollectionObject): Promise<CollectionObject> {
+    public async update<T extends CollectionObject>(id: ObjectId, body: T): Promise<T> {
         const res = await this._model.updateById(id, body);
         if (undefined == res) {
             throw new BadRequest({field: 'surveyId', type: ErrorType.unknown});
@@ -24,7 +24,7 @@ export default class Service extends AService<Model> {
         return res;
     }
 
-    public async remove(id: ObjectId):Promise<boolean> {
+    public async remove(id: ObjectId): Promise<boolean> {
         return this._model.dropById(id);
     }
 }

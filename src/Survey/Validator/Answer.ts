@@ -9,7 +9,7 @@ export default class Answer extends AValidator {
         super();
     }
 
-    public verifyInsert<T extends CollectionObject>(payload: T): typeof payload {
+    public verifyInsert<T extends CollectionObject>(payload: T): T {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};
 
@@ -18,7 +18,7 @@ export default class Answer extends AValidator {
         return this._verify(errors, cleanedPayload);
     }
 
-    public verifyInsertExternal<T extends CollectionObject>(payload: T): typeof payload {
+    public verifyInsertExternal<T extends CollectionObject>(payload: T): T {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};
 
@@ -27,7 +27,7 @@ export default class Answer extends AValidator {
         return this._verifyExternal(errors, cleanedPayload);
     }
 
-    public verifyUpdate<T extends CollectionObject>(payload: T): typeof payload {
+    public verifyUpdate<T extends CollectionObject>(payload: T): T {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};
 
@@ -36,7 +36,7 @@ export default class Answer extends AValidator {
         return this._verify(errors, cleanedPayload);
     }
 
-    public verifyUpdateExternal<T extends CollectionObject>(payload: T): typeof payload {
+    public verifyUpdateExternal<T extends CollectionObject>(payload: T): T {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};
 

@@ -14,7 +14,11 @@ import helmet = require("helmet");
  * init and handle express
  */
 export default class App extends AObject {
-    public static readonly ENVIRONMENT = Arguments.get('ENVIRONMENT').ENVIRONMENT == Environment.Production ? Environment.Production : Environment.Development;
+    public static readonly ENVIRONMENT =
+        typeof global.it === 'function' ? Environment.Test :
+            Arguments.get('ENVIRONMENT').ENVIRONMENT == Environment.Production ? Environment.Production :
+                Environment.Development
+    ;
     private readonly _express: express.Express = express();
     private readonly _routes: { [key: string]: express.Router } = {};
     private _errorHandler: ErrorHandler = new ErrorHandler();
