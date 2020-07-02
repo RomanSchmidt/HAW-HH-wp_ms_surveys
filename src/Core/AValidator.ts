@@ -50,6 +50,17 @@ export default abstract class AValidator extends AObject {
         );
     }
 
+    public isMongoId(id: any): boolean {
+        return (
+            id instanceof mongoose.Types.ObjectId ||
+            typeof id == 'string' && validator.isHexadecimal(id) && id.length === 24
+        );
+    }
+
+    public isArray(value: any): boolean {
+        return Array.isArray(value);
+    }
+
     protected _validateArray(payload: CollectionObject, key: string, check: (value: any) => boolean, mandantory: boolean, cleanedPayload: CollectionObject, errors: ErrorContainer): void {
         if (!payload) {
             mandantory && errors.push({field: key, type: ErrorType.empty});
@@ -87,7 +98,7 @@ export default abstract class AValidator extends AObject {
         if (Object.keys(subErrors).length) {
             for (const subKey in subErrors) {
                 const subError = subErrors[subKey];
-                subErrors.push({field: key + '.' + subError.field, type: subError.type});
+                errors.push({field: key + '.' + subError.field, type: subError.type});
             }
             return;
         }

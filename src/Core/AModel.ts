@@ -11,7 +11,7 @@ import BadRequest from "./Error/BadRequest";
 export default abstract class AModel<T extends AValidator, V extends ASchema> extends AObject {
     private readonly _validator: T;
     private readonly _schema: V;
-    private _db: mongoose.Model<mongoose.Document> = <any>undefined;
+    protected _db: mongoose.Model<mongoose.Document> = <any>undefined;
 
     protected constructor(validator: T, schema: V) {
         super();

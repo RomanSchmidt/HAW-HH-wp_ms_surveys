@@ -16,8 +16,16 @@ export default class Service extends AService<Model> {
         return this._model.insert(body);
     }
 
-    public async update(id: ObjectId, body: CollectionObject): Promise<CollectionObject> {
-        const res = await this._model.updateById(id, body);
+    public async update(id: ObjectId, projection: CollectionObject): Promise<CollectionObject> {
+        const res = await this._model.updateById(id, projection);
+        if (undefined == res) {
+            throw new BadRequest({field: 'opinionId', type: ErrorType.unknown});
+        }
+        return res;
+    }
+
+    public async getBySurveyId(surveyId: ObjectId, projection: {}): Promise<CollectionObject[]> {
+        const res = await this._model.getBySurveyId(surveyId, projection);
         if (undefined == res) {
             throw new BadRequest({field: 'opinionId', type: ErrorType.unknown});
         }
