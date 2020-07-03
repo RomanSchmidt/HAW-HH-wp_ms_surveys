@@ -10,6 +10,24 @@ export default class Survey extends AValidator {
         super();
     }
 
+    public verifyIncreaseExternal<T extends { [key: string]: number; }>(payload: T): T {
+        const errors: ErrorContainer = [];
+        const cleanedPayload = <T>{};
+
+        this._validate(payload, 'userCounter', this.isPositiveInt, false, cleanedPayload, errors);
+
+        return this._verify(errors, cleanedPayload);
+    }
+
+    public verifyIncrease<T extends { [key: string]: number; }>(payload: T): T {
+        const errors: ErrorContainer = [];
+        const cleanedPayload = <T>{};
+
+        this._validate(payload, 'userCounter', this.isPositiveInt, false, cleanedPayload, errors);
+
+        return this._verify(errors, cleanedPayload);
+    }
+
     public verifyInsert<T extends CollectionObject>(payload: T = <T>{}): typeof payload {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};

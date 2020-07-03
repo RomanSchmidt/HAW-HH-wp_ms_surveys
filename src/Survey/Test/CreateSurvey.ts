@@ -18,7 +18,7 @@ export class CreateSurvey extends AObject {
         before(async () => {
             const model = new Model();
             await model.init();
-            return model.getDb()?.deleteMany({});
+            await model.getDb()?.deleteMany({});
         });
     }
 
@@ -31,7 +31,10 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({title: ErrorType.empty, questions: ErrorType.empty});
+                message.should.be.eql({
+                    title: ErrorType.empty,
+                    questions: ErrorType.empty
+                });
                 return;
             }
             false.should.be.true('no exception');
@@ -47,7 +50,7 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({questions: ErrorType.empty});
+                message.should.be.eql({questions: ErrorType.empty});
                 return;
             }
             false.should.be.true('no exception');
@@ -64,7 +67,7 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({questions: ErrorType.empty});
+                message.should.be.eql({questions: ErrorType.empty});
                 return;
             }
             false.should.be.true('no exception');
@@ -81,26 +84,10 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({'questions.0.title': ErrorType.empty});
-                return;
-            }
-            false.should.be.true('no exception');
-        });
-
-        it('should not save with invalid title in question', async () => {
-            try {
-                await new Service().create({
-                    title: 'survey1',
-                    questions: [{title: 1}]
-                });
-            } catch (e) {
-                should(e).be.an.Object();
-                should(e).have.property('message').which.is.an.String();
-                const message = JSON.parse(e.message);
-                message.should.be.an.Object();
-                message.should.have.properties({
-                    'questions.0.title': ErrorType.invalid,
-                    'questions.0.answers': ErrorType.empty
+                message.should.be.eql({
+                    'questions.0.title': ErrorType.empty,
+                    'questions.0.answers': ErrorType.empty,
+                    'questions.0': ErrorType.invalid
                 });
                 return;
             }
@@ -118,9 +105,31 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({
+                message.should.be.eql({
                     'questions.0.title': ErrorType.invalid,
-                    'questions.0.answers': ErrorType.empty
+                    'questions.0.answers': ErrorType.empty,
+                    'questions.0': ErrorType.invalid
+                });
+                return;
+            }
+            false.should.be.true('no exception');
+        });
+
+        it('should not save with invalid title in question', async () => {
+            try {
+                await new Service().create({
+                    title: 'survey1',
+                    questions: [{title: 1}]
+                });
+            } catch (e) {
+                should(e).be.an.Object();
+                should(e).have.property('message').which.is.an.String();
+                const message = JSON.parse(e.message);
+                message.should.be.an.Object();
+                message.should.be.eql({
+                    'questions.0.title': ErrorType.invalid,
+                    'questions.0.answers': ErrorType.empty,
+                    'questions.0': ErrorType.invalid
                 });
                 return;
             }
@@ -138,8 +147,9 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({
-                    'questions.0.answers': ErrorType.empty
+                message.should.be.eql({
+                    'questions.0.answers': ErrorType.empty,
+                    'questions.0': ErrorType.invalid
                 });
                 return;
             }
@@ -157,8 +167,9 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({
-                    'questions.0.answers': ErrorType.empty
+                message.should.be.eql({
+                    'questions.0.answers': ErrorType.empty,
+                    'questions.0': ErrorType.invalid,
                 });
                 return;
             }
@@ -176,8 +187,10 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({
-                    'questions.0.answers.0.title': ErrorType.empty
+                message.should.be.eql({
+                    'questions.0.answers.0.title': ErrorType.empty,
+                    'questions.0.answers.0': ErrorType.invalid,
+                    'questions.0': ErrorType.invalid
                 });
                 return;
             }
@@ -195,8 +208,10 @@ export class CreateSurvey extends AObject {
                 should(e).have.property('message').which.is.an.String();
                 const message = JSON.parse(e.message);
                 message.should.be.an.Object();
-                message.should.have.properties({
-                    'questions.0.answers.0.title': ErrorType.invalid
+                message.should.be.eql({
+                    'questions.0.answers.0.title': ErrorType.invalid,
+                    'questions.0.answers.0': ErrorType.invalid,
+                    'questions.0': ErrorType.invalid
                 });
                 return;
             }
@@ -214,6 +229,7 @@ export class CreateSurvey extends AObject {
 
             survey.should.be.an.Object();
             survey.should.have.property('title', payload.title);
+            survey.should.have.property('userCounter', 0);
             survey.should.have.property('questions').which.is.an.Array().with.lengthOf(1);
             survey.questions[0].should.have.property('title', payload.questions[0].title);
             survey.questions[0].should.have.property('answers').which.is.an.Array().with.lengthOf(2);

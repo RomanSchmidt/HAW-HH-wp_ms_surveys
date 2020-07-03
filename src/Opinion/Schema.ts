@@ -2,7 +2,7 @@ import ASchema from "../Core/ASchema";
 import * as mongoose from "mongoose";
 
 export default class Schema extends ASchema {
-    protected _name = 'Schema';
+    protected _name = 'Opinion';
 
     public getSchema(): mongoose.Schema {
         const schema = new mongoose.Schema({

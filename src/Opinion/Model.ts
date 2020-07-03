@@ -14,4 +14,9 @@ export default class Model extends AModel<Validator, Schema> {
     public async getBySurveyId(surveyId: ObjectId, projection: {}): Promise<CollectionObject[]> {
         return await this._db.find({surveyId}, projection).lean().exec();
     }
+
+    public async removeBySurveyId(surveyId: ObjectId):Promise<boolean> {
+        const result = await this._db.deleteMany({surveyId});
+        return (result?.deletedCount || 0) > 0;
+    }
 }

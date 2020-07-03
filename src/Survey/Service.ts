@@ -34,6 +34,8 @@ export default class Service extends AService<Model> {
     }
 
     public async remove(id: ObjectId): Promise<boolean> {
-        return this._model.dropById(id);
+        const returnValue = await this._model.dropById(id);
+        await new Opinion().delete.bySurveyId(id);
+        return returnValue;
     }
 }

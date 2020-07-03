@@ -9,9 +9,9 @@ import {ErrorType} from "./Error/ErrorType";
 import BadRequest from "./Error/BadRequest";
 
 export default abstract class AModel<T extends AValidator, V extends ASchema> extends AObject {
+    protected _db: mongoose.Model<mongoose.Document> = <any>undefined;
     private readonly _validator: T;
     private readonly _schema: V;
-    protected _db: mongoose.Model<mongoose.Document> = <any>undefined;
 
     protected constructor(validator: T, schema: V) {
         super();
@@ -51,7 +51,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         return this.update({_id: id}, body);
     }
 
-    public async update<T extends CollectionObject>(filter: { [key: string]: any }, payload: T): Promise<typeof payload | undefined> {
+    public async update<T extends CollectionObject>(filter: { [key: string]: any }, payload: T): Promise<T | undefined> {
         if (this._validator.isEmpty(payload)) {
             throw new BadRequest({field: 'payload', type: ErrorType.empty});
         }
@@ -74,10 +74,10 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
         return <T>returnObject;
     }
 
-    public async insert<T extends CollectionObject>(body: T): Promise<typeof body> {
+    public async insert<T extends CollectionObject>(payload: T): Promise<T> {
         const
-            cleanedBody = this._validator.verifyInsert(body),
-            result = await this._db.create(cleanedBody);
+            cleanedPayload = this._validator.verifyInsert(payload),
+            result = await this._db.create(cleanedPayload);
 
         if (!result) {
             throw new InternalServerError({field: 'insertResult', type: ErrorType.invalid});
@@ -88,5 +88,27 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     public async dropById(id: mongoose.Types.ObjectId): Promise<boolean> {
         const result = await this._db.deleteOne({_id: id});
         return (result?.deletedCount || 0) > 0;
+    }
+
+    public async increaseById<T extends { [key: string]: number }>(id: mongoose.Types.ObjectId, payload: T): Promise<T> {
+        const select: { [key: string]: number } = {_id: 0};
+        for (const index in payload) {
+            select[index] = 1;
+        }
+        const cleanedPayload = this._validator.verifyIncrease(payload);
+        this.log('1', cleanedPayload);
+
+        const result = await this._db.findOneAndUpdate({_id: id}, {$inc: cleanedPayload}, {
+            lean: true,
+            new: true,
+            select
+        });
+
+        if (!result) {
+            this.logError('mongo error', {_id: id}, {$inc: cleanedPayload})
+            throw new InternalServerError({field: 'insertResult', type: ErrorType.invalid});
+        }
+
+        return <T><any>result;
     }
 }

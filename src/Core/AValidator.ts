@@ -10,13 +10,17 @@ import InternalServerError from "./Error/InternalServerError";
 
 export default abstract class AValidator extends AObject {
 
-    public abstract verifyUpdate<T extends CollectionObject>(payload: T): typeof payload;
+    public abstract verifyUpdate<T extends CollectionObject>(payload: T): T;
 
-    public abstract verifyUpdateExternal<T extends CollectionObject>(payload: T): typeof payload;
+    public abstract verifyUpdateExternal<T extends CollectionObject>(payload: T): T;
 
-    public abstract verifyInsert<T extends CollectionObject>(payload: T): typeof payload;
+    public abstract verifyInsert<T extends CollectionObject>(payload: T): T;
 
-    public abstract verifyInsertExternal<T extends CollectionObject>(payload: T): typeof payload;
+    public abstract verifyIncrease<T extends { [key: string]: number }>(payload: T): T;
+
+    public abstract verifyIncreaseExternal<T extends { [key: string]: number }>(payload: T): T;
+
+    public abstract verifyInsertExternal<T extends CollectionObject>(payload: T): T;
 
     public convertMongoIdString(id: string): mongoose.Types.ObjectId | undefined {
         if (this.isString(id) && validator.isHexadecimal(id) && id.length === 24) {
@@ -61,6 +65,14 @@ export default abstract class AValidator extends AObject {
         return Array.isArray(value);
     }
 
+    public isPositiveInt(value: any): boolean {
+        return this.isInt(value) && value > 0;
+    }
+
+    public isInt(value: any): boolean {
+        return null !== value && undefined !== value && value.toString && validator.isInt(value.toString());
+    }
+
     protected _validateArray(payload: CollectionObject, key: string, check: (value: any) => boolean, mandantory: boolean, cleanedPayload: CollectionObject, errors: ErrorContainer): void {
         if (!payload) {
             mandantory && errors.push({field: key, type: ErrorType.empty});
@@ -84,7 +96,7 @@ export default abstract class AValidator extends AObject {
             subCleanedPayload[parseInt(index)] = {};
             this._validate(<CollectionObject>payload[key], parseInt(index), (value: CollectionObject) => {
                 try {
-                    return check(value);
+                    return check.call(this, value);
                 } catch (e) {
                     if (e instanceof AError) {
                         e.getMessageObject().forEach(error => {
@@ -114,7 +126,7 @@ export default abstract class AValidator extends AObject {
             mandantory && errors.push({field: key.toString(), type: ErrorType.empty});
             return;
         }
-        if (!check(payload[key])) {
+        if (!check.call(this, payload[key])) {
             errors.push({field: key.toString(), type: ErrorType.invalid});
         }
         if (!Object.keys(errors).length) {

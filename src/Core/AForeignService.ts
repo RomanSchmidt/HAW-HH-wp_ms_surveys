@@ -6,11 +6,14 @@ import fetch from "node-fetch";
 import {ControllerOutgoings} from "./Declorator/ControllerOutgoings";
 import {CollectionObject} from "./Declorator/CollectionObject";
 
+type returnType = Promise<CollectionObject | CollectionObject[] | void>;
+
 export default abstract class AForeignService extends AObject {
-    public readonly abstract get: { [key: string]: (...argument: any[]) => Promise<CollectionObject | CollectionObject[]> };
-    public readonly abstract post: { [key: string]: (...argument: any[]) => Promise<CollectionObject | CollectionObject[]> };
-    public readonly abstract put: { [key: string]: (...argument: any[]) => Promise<CollectionObject | CollectionObject[]> };
-    public readonly abstract delete: { [key: string]: (...argument: any[]) => Promise<CollectionObject | CollectionObject[]> };
+    public readonly abstract get: { [key: string]: (...argument: any[]) => returnType };
+    public readonly abstract post: { [key: string]: (...argument: any[]) => returnType };
+    public readonly abstract put: { [key: string]: (...argument: any[]) => returnType };
+    public readonly abstract patch: { [key: string]: (...argument: any[]) => returnType };
+    public readonly abstract delete: { [key: string]: (...argument: any[]) => returnType };
     protected abstract readonly _path: string;
     private _needInit: boolean = true;
 
@@ -28,28 +31,34 @@ export default abstract class AForeignService extends AObject {
         await this._connect();
     }
 
-    protected async _performGetRequest(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
-        return await this._performRequest('GET', param);
+    protected async _performGetRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+        return await this._performRequest<T>('GET', param);
     }
 
-    protected async _performPostRequest(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
-        return await this._performRequest('POST', param);
+    protected async _performPatchRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+        return await this._performRequest<T>('PATCH', param);
     }
 
-    protected async _performDeleteRequest(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
-        return await this._performRequest('DELETE', param);
+    protected async _performPostRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+        return await this._performRequest<T>('POST', param);
     }
 
-    protected async _performPutRequest(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
-        return await this._performRequest('PUT', param);
+    protected async _performDeleteRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+        return await this._performRequest<T>('DELETE', param);
+    }
+
+    protected async _performPutRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+        return await this._performRequest<T>('PUT', param);
     }
 
     // @todo user params.params + params.query
-    protected async _performRequest(method: 'GET' | 'POST' | 'DELETE' | 'PUT', params: ControllerOutgoings): Promise<CollectionObject[] | CollectionObject> {
+    protected async _performRequest<T extends CollectionObject[] | CollectionObject>(method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH', params: ControllerOutgoings): Promise<T> {
         let response;
+        const url = this._createUrl(params);
         try {
-            response = await fetch(this.getPath(), {
+            response = await fetch(url, {
                 method: method,
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(params.body) || undefined
             });
         } catch (err) {
@@ -65,14 +74,31 @@ export default abstract class AForeignService extends AObject {
             }
         }
         if (response.status >= 400) {
-            this.logError('serverResult', {path: this.getPath(), status: response.status, headers: response.headers});
+            this.logError('serverResult', {url, method, status: response.status, headers: response.headers});
             throw new InternalServerError({
-                field: 'Foreign_Service_' + this.constructor.name,
+                field: 'Foreign_Service_' + this.constructor.name + '_Request',
                 type: ErrorType.invalid
             });
         }
         const json = await response.json();
         return <any>json.success;
+    }
+
+    private _createUrl(params: ControllerOutgoings): string {
+        let url = this.getPath();
+        if (params.params?.length) {
+            if (!url.endsWith('/')) {
+                url += '/';
+            }
+            url += params.params.join('/');
+        }
+        if (params.query) {
+            url += '?';
+            for (const key in params.query) {
+                url += key + '=' + params.query[key];
+            }
+        }
+        return url;
     }
 
     private async _connect(): Promise<void> {

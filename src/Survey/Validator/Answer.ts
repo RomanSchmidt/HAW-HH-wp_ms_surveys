@@ -9,6 +9,14 @@ export default class Answer extends AValidator {
         super();
     }
 
+    public verifyIncreaseExternal<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
+    }
+
+    public verifyIncrease<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
+    }
+
     public verifyInsert<T extends CollectionObject>(payload: T): T {
         const errors: ErrorContainer = [];
         const cleanedPayload = <T>{};

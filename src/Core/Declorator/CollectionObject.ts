@@ -1,4 +1,4 @@
-import {Schema} from "mongoose";
+import {Types} from "mongoose";
 
 type types =
     number
@@ -7,7 +7,6 @@ type types =
     | boolean
     | Date
     | Buffer
-    | Schema.Types.ObjectId
-    | Schema.Types.Mixed;
+    | Types.ObjectId;
 
 export type CollectionObject = { [key: string]: types | types[] };

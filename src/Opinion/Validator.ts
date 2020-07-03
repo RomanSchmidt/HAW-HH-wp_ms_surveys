@@ -4,12 +4,20 @@ import {CollectionObject} from "../Core/Declorator/CollectionObject";
 import {SingletonObject} from "../Core/Decorator/SingletonObject";
 import {ErrorType} from "../Core/Error/ErrorType";
 import {ErrorContainer} from "../Core/Declorator/ErrorContainer";
-import {Schema} from "mongoose";
+import {Types} from "mongoose";
 
 @SingletonObject
 export default class Validator extends AValidator {
     constructor() {
         super();
+    }
+
+    public verifyIncreaseExternal<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
+    }
+
+    public verifyIncrease<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
     }
 
     public verifyInsert<T extends CollectionObject>(payload: T = <T>{}): typeof payload {
@@ -48,20 +56,30 @@ export default class Validator extends AValidator {
     }
 
     private _verifyResponses<T extends CollectionObject>(payload: T, cleanedPayload: T, errors: ErrorContainer): void {
-        const responses: { questionId: Schema.Types.ObjectId, answerIds: Schema.Types.ObjectId | string[] }[] = <any>cleanedPayload.response;
+        const responses: { questionId: Types.ObjectId, answerIds: Types.ObjectId | string[] }[] = <any>cleanedPayload.response;
         if (!responses?.length) {
             errors.push({field: 'response', type: ErrorType.empty});
         } else {
             const cleanedResponses: typeof responses = [];
+            let responseNumber = 0;
             responses.forEach(response => {
-                const cleanedResponse: typeof response = <any>{};
-                this._validate(response, 'questionId', this.isMongoId, true, cleanedResponse, errors);
-                this._validateArray(response, 'answerIds', this.isMongoId, true, cleanedResponse, errors);
+                const
+                    cleanedResponse: typeof response = <any>{},
+                    nestedErrors: ErrorContainer = [];
+                this._validate(response, 'questionId', this.isMongoId, true, cleanedResponse, nestedErrors);
+                this._validateArray(response, 'answerIds', this.isMongoId, true, cleanedResponse, nestedErrors);
 
                 if ('answerIds' in cleanedResponse) {
                     (<string[]>cleanedResponse.answerIds).map(value => this.convertMongoIdString(value));
                 }
                 cleanedResponses.push(cleanedResponse);
+                if (nestedErrors.length) {
+                    nestedErrors.forEach((value) => errors.push({
+                        field: 'response.' + responseNumber + '.' + value.field,
+                        type: value.type
+                    }))
+                }
+                ++responseNumber;
             });
             if (!errors.length) {
                 (<any>payload).responses = cleanedResponses;

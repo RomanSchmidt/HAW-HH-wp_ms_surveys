@@ -50,6 +50,8 @@
   "license": "ISC",
   "mocha": {
     "ui": "bdd",
+    "exit": true,
+    "bail": true,
     "require": [
       "ts-node/register",
       "source-map-support/register"

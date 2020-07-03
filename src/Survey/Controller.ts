@@ -9,6 +9,16 @@ export default class Controller extends AController {
     protected readonly _path = 'survey';
     protected _service: Service = new Service();
     private _validator: Survey = new Survey();
+    readonly patch = {
+        ':id': async (income: ControllerIncome): Promise<{}> => {
+            const id = this._validator.convertMongoIdString(income.params.id);
+            if (id) {
+                const query = this._validator.verifyIncreaseExternal(income.query);
+                return this._service.increase(id, query);
+            }
+            throw new BadRequest({field: 'id', type: ErrorType.invalid});
+        }
+    };
     public readonly delete = {
         ':id': async (income: ControllerIncome): Promise<{}> => {
             const id = this._validator.convertMongoIdString(income.params.id);
@@ -30,6 +40,7 @@ export default class Controller extends AController {
     };
     public readonly post = {
         index: async (income: ControllerIncome): Promise<{}> => {
+            this.log('WTF!', income.body);
             const body = this._validator.verifyInsertExternal(income.body);
             return this._service.create(body);
         }

@@ -6,9 +6,16 @@ import Answer from "./Answer";
 
 @SingletonObject
 export default class Question extends AValidator {
-
     constructor() {
         super();
+    }
+
+    public verifyIncreaseExternal<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
+    }
+
+    public verifyIncrease<T extends { [key: string]: number; }>(_payload: T): T {
+        throw new Error("Method not implemented.");
     }
 
     public verifyInsert<T extends CollectionObject>(payload: T): T {

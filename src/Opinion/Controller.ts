@@ -7,10 +7,19 @@ import {ErrorType} from "../Core/Error/ErrorType";
 
 export default class Controller extends AController {
 
-    public readonly delete = {};
+    public readonly delete = {
+        index: async (income: ControllerIncome): Promise<{}> => {
+            const surveyId = this._validator.convertMongoIdString(income.query.surveyId);
+            if (surveyId) {
+                return this._service.removeBySurveyId(surveyId);
+            }
+            throw new BadRequest({field: 'surveyId', type: ErrorType.invalid});
+        }
+    };
     protected readonly _path = 'opinion';
     protected readonly _service = new Service();
     private _validator: Validator = new Validator();
+    readonly patch = {};
     public readonly put = {
         ':id': async (income: ControllerIncome): Promise<{}> => {
             const id = this._validator.convertMongoIdString(income.params.id);

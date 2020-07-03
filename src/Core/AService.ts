@@ -31,4 +31,8 @@ export default abstract class AService<T extends AModel<AValidator, ASchema>> ex
     ): Promise<Result[]> {
         return this._model.getAll(filter, projection);
     }
+
+    public async increase<T extends { [key: string]: number }>(id: mongoose.Types.ObjectId, payload: T): Promise<T> {
+        return this._model.increaseById(id, payload);
+    }
 }

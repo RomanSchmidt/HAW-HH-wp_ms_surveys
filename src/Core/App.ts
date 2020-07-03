@@ -59,7 +59,7 @@ export default class App extends AObject {
         this._foreignServices.push(service);
     }
 
-    private _registerMethod(method: 'get' | 'put' | 'post' | 'delete', controller: AController, actionName: string): void {
+    private _registerMethod(method: 'get' | 'put' | 'post' | 'delete' | 'patch', controller: AController, actionName: string): void {
         const functionName = actionName;
         actionName == 'index' && (actionName = '');
 
@@ -76,8 +76,12 @@ export default class App extends AObject {
                     res.status(200).json({error: null, success: result === undefined ? null : result});
                 })
                 .catch((err: Error) => {
-                    const foo = this._errorHandler.analyze(err);
-                    res.status(foo.status).json({error: foo.message, success: null});
+                    const analyzeResult = this._errorHandler.analyze(err);
+                    if (analyzeResult.status >= 500) {
+                        this.logError('internal Exception', err);
+
+                    }
+                    res.status(analyzeResult.status).json({error: analyzeResult.message, success: null});
                 })
             ;
         });
@@ -111,7 +115,7 @@ export default class App extends AObject {
         this._express.use((req, res, next) => {
             res.header('Access-Controll-Allow-Credentials', 'true');
             res.header('Access-Controll-Allow-Origin', req.headers.origin);
-            res.header('Access-Controll-Allow-Methods', 'GET,PUT,POST,DELETE');
+            res.header('Access-Controll-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
             res.header('Access-Controll-Allow-HEADERS', 'X-Requested-With, Authorizatoin, X-HTTP-Method-Override, Content-Type, Accept');
             undefined === req.headers.orign && res.header("Cache-Control", "no-cache");
             if ('OPTIONS' === req.method) {
@@ -157,6 +161,9 @@ export default class App extends AObject {
         }
         for (let actionName in this._controller.put) {
             this._registerMethod('put', this._controller, actionName);
+        }
+        for (let actionName in this._controller.patch) {
+            this._registerMethod('patch', this._controller, actionName);
         }
         for (let actionName in this._controller.delete) {
             this._registerMethod('delete', this._controller, actionName);
