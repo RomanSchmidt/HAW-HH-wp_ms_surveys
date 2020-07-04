@@ -32,9 +32,9 @@ export class Db extends AObject {
     private async _connect(): Promise<void> {
         let uri = Arguments.get('MONGO_URI').MONGO_URI || 'mongodb://localhost:27017/rn_surveys';
         if (App.ENVIRONMENT === Environment.Test) {
-            //uri += '_test';
+            uri += '_test';
         }
-        this.log('db', uri);
+        this.log('db connecting to:', uri);
         this._db = await mongoose.connect(uri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,

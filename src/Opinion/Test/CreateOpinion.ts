@@ -22,14 +22,17 @@ export class CreateOpinion extends AObject {
             const model = new Model();
             await model.init();
             await model.getDb()?.deleteMany({});
-            this._survey = <any>await new Survey().post.create({
-                title: 'foo',
-                questions: [{title: 'A or B', answers: [{'title': 'A'}, {'title': 'B'}]}]
-            })
         });
     }
 
     private _run(): void {
+        it('should create survey', async () => {
+            this._survey = <any>await new Survey().post.create({
+                title: 'foo',
+                questions: [{title: 'A or B', answers: [{'title': 'A'}, {'title': 'B'}]}]
+            });
+        })
+
         it('should not save with empty payload', async () => {
             try {
                 await new Service().create({});

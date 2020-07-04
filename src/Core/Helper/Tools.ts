@@ -3,6 +3,10 @@ export default abstract class Tools {
     private constructor() {
     }
 
+    public static timeout(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     public static formatTime(dateValue: number | Date, withTime: boolean): string {
         let
             date = new Date(dateValue),

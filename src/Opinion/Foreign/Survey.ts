@@ -2,6 +2,7 @@ import AForeignService from "../../Core/AForeignService";
 import {SingletonObject} from "../../Core/Decorator/SingletonObject";
 import * as mongoose from "mongoose";
 import {CollectionObject} from "../../Core/Declorator/CollectionObject";
+import Arguments from "../../Core/Helper/Arguments";
 
 @SingletonObject
 export default class Survey extends AForeignService {
@@ -22,8 +23,7 @@ export default class Survey extends AForeignService {
             return <T>await this._performGetRequest<T>({params: [surveyId.toString()]});
         }
     };
-    // @todo make it configurable
-    protected readonly _path: string = 'http://localhost:8080/survey';
+    protected readonly _path: string = Arguments.get('FOREIGN_SERVICE_SURVEY').FOREIGN_SERVICE_SURVEY || 'http://localhost:8080/survey';
 
     public constructor() {
         super();

@@ -1,5 +1,9 @@
 version: '3'
 
+networks:
+  backendservices:
+    driver: bridge
+
 services:
   # -------------------------------------------------------
   # Databases
@@ -9,3 +13,39 @@ services:
     container_name: mongo
     ports:
       - 27017:27017
+    networks:
+      - backendservices
+
+  surveyservice:
+    build:
+      context: .
+      dockerfile: src/Survey/Dockerfile
+    container_name: surveyservice
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      - ENVIRONMENT=development
+      - PORT=8080
+      - MONGO_URI=mongodb://mongo:27017/rn_surveys
+      - FOREIGN_SERVICE_OPINION=http://opinionservice:8081/opinion/
+    networks:
+      - backendservices
+
+  opinionservice:
+    build:
+      context: .
+      dockerfile: src/Opinion/Dockerfile
+    container_name: opinionservice
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - ENVIRONMENT=development
+      - PORT=8081
+      - MONGO_URI=mongodb://mongo:27017/rn_surveys
+      - FOREIGN_SERVICE_SURVEY=http://surveyservice:8080/survey/
+    networks:
+      - backendservices

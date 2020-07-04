@@ -37,7 +37,8 @@
   ],
   "exclude": [
     "node_modules",
-    "Survey/node_modules"
+    "src/Survey/node_modules",
+    "src/Opinion/node_modules"
   ],
   "user": {
     "loader": "awesome-typescript-loader"
