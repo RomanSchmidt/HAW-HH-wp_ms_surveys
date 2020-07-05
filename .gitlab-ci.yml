@@ -4,6 +4,7 @@ before_script:
   - npm install mocha -g --save
   - npm install source-map-support -g --save
   - npm install typescript -g --save
+  - npm install ts-node -g --save
 
 stages:
   - compile-and-test-stage
