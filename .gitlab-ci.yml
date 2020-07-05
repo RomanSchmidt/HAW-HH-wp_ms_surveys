@@ -18,4 +18,5 @@ compile-and-test-stage:
   services:
     - mongo:$MONGODB_VERSION
   script:
+    - npm run build
     - npm run testDot
