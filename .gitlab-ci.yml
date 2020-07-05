@@ -1,6 +1,9 @@
 #This command is run before all the jobs
 before_script:
   - npm install
+  - npm install mocha -g --save
+  - npm install source-map-support -g --save
+  - npm install typescript -g --save
 
 stages:
   - compile-and-test-stage
