@@ -58,7 +58,6 @@ export default abstract class AForeignService extends AObject {
     protected async _performRequest<T extends CollectionObject[] | CollectionObject>(method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH', params: ControllerOutgoings): Promise<T> {
         let response;
         const url = this._createUrl(params);
-        this.log('requesting: ', {method, url});
         try {
             response = await fetch(url, {
                 method: method,
