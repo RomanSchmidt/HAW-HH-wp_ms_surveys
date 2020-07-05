@@ -28,7 +28,7 @@ services:
     environment:
       - ENVIRONMENT=development
       - PORT=8080
-      - MONGO_URI=mongodb://mongo:27017/rn_surveys
+      - MONGO_URI=mongodb://mongo:27017/wp_ms_surveys
       - FOREIGN_SERVICE_OPINION=http://opinionservice:8081/opinion/
     networks:
       - backendservices
@@ -45,7 +45,7 @@ services:
     environment:
       - ENVIRONMENT=development
       - PORT=8081
-      - MONGO_URI=mongodb://mongo:27017/rn_surveys
+      - MONGO_URI=mongodb://mongo:27017/wp_ms_surveys
       - FOREIGN_SERVICE_SURVEY=http://surveyservice:8080/survey/
     networks:
       - backendservices

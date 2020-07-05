@@ -1,5 +1,5 @@
 {
-  "name": "rn_surveys",
+  "name": "wp_ms_surveys",
   "version": "1.0.0",
   "description": "creat and answer surveys",
   "main": "dist/index.js",

@@ -30,7 +30,7 @@ export class Db extends AObject {
     }
 
     private async _connect(): Promise<void> {
-        let uri = Arguments.get('MONGO_URI').MONGO_URI || 'mongodb://localhost:27017/rn_surveys';
+        let uri = Arguments.get('MONGO_URI').MONGO_URI || 'mongodb://localhost:27017/wp_ms_surveys';
         if (App.ENVIRONMENT === Environment.Test) {
             uri += '_test';
         }
