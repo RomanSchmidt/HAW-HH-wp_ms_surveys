@@ -7,16 +7,33 @@ before_script:
   - npm install ts-node -g --save
 
 stages:
-  - compile-and-test-stage
+  - build
+  #- test
+
+services:
+  - mongo:$MONGODB_VERSION
+
+cache:
+  paths:
+    - node_modules/
 
 variables:
   MONGODB_VERSION: "4.2"
 
-compile-and-test-stage:
-  stage: compile-and-test-stage
+install_dependencies:
+  stage: build
   image: node:12.18.2-slim
-  services:
-    - mongo:$MONGODB_VERSION
   script:
     - npm run build
-    - npm run testDot
+  artifacts:
+    expire_in: 1 days
+    when: on_success
+    paths:
+      - node_modules/
+
+#testing_testing:
+#  stage: test
+#  dependencies:
+#    - npm
+#  script:
+#    - npm run testDot

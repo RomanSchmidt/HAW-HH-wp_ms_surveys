@@ -34,7 +34,6 @@
   "scripts": {
     "test": "mocha dist/Survey/Test && mocha dist/Opinion/Test",
     "testDot": "mocha dist/Survey/Test --reporter dot && mocha dist/Opinion/Test --reporter dot",
-    "start": "node dist/index.js",
     "build": "rm -rf ./dist && tsc"
   },
   "repository": {
