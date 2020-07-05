@@ -12,6 +12,9 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": [
+      "node"
+    ],
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "inlineSourceMap": true,
