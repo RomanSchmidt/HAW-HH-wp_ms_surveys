@@ -4,6 +4,7 @@ RUN npm install pm2 -g --save
 RUN npm install ts-node -g --save
 RUN npm install source-map-support -g --save
 RUN npm install typescript -g --save
+#RUN npm install mocha -g --save
 RUN mkdir -p /app
 
 WORKDIR /app
@@ -12,17 +13,14 @@ COPY tsconfig.json .
 COPY package.json .
 COPY npm-shrinkwrap.json .
 
-RUN npm install
+RUN npm install --save-dev
 
-#COPY src/ src/
-COPY dist/Core dist/Core
-COPY dist/Opinion dist/Opinion
+COPY src/ src/
 
-#RUN ls -la /app
+RUN npm run build
+#RUN npm run testDot
 
-#RUN tsc
-
-#COPY dist/ ./dist
+RUN npm install --save-prod
 
 EXPOSE "$PORT"
 

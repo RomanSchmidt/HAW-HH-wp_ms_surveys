@@ -8,13 +8,7 @@
     "noUnusedParameters": true,
     "alwaysStrict": true,
     "preserveConstEnums": true,
-    "preserveSymlinks": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "types": [
-      "node"
-    ],
+    "preserveSymlinks": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "inlineSourceMap": true,
@@ -27,26 +21,17 @@
     "noEmitHelpers": false,
     "strictPropertyInitialization": true,
     "skipDefaultLibCheck": true,
-    "lib": [
-      "es6",
-      "dom"
-    ]
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": ["node", "mocha"]
   },
   "include": [
-    "src/**/*.ts"
-  ],
-  "typeRoots": [
-    "node_modules/@type"
+    "src/"
   ],
   "exclude": [
     "node_modules",
     "src/Survey/node_modules",
     "src/Opinion/node_modules"
-  ],
-  "user": {
-    "loader": "awesome-typescript-loader"
-  },
-  "awesomeTypescriptLoaderOptions": {
-    "useTranspileModule": true
-  }
+  ]
 }
