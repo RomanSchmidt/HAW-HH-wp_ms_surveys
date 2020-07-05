@@ -1,0 +1,17 @@
+#This command is run before all the jobs
+before_script:
+  - npm install
+
+stages:
+  - compile-and-test-stage
+
+variables:
+  MONGODB_VERSION: "4.2"
+
+compile-and-test-stage:
+  stage: compile-and-test-stage
+  image: node:12.18.2-slim
+  services:
+    - mongo:$MONGODB_VERSION
+  script:
+    - npm run testDot

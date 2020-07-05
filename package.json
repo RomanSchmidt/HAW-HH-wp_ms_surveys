@@ -37,14 +37,14 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "test": "mocha dist/Test",
-    "testDot": "mocha dist/Test --reporter dot",
+    "test": "mocha dist/Survey/Test && mocha dist/Opinion/Test",
+    "testDot": "mocha dist/Survey/Test --reporter dot && mocha dist/Opinion/Test --reporter",
     "start": "node dist/index.js",
     "build": "rm -rf ./dist && tsc"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com//RomanSchmidtAppinio/rn_surveys.git"
+    "url": "https://git.haw-hamburg.de/acn887/wp_ms_surveys.git"
   },
   "author": "Roman Schmidt",
   "license": "ISC",
