@@ -26,7 +26,7 @@ phases:
       #- npm test
       - echo Build started on ´date´
       - echo Building the Docker image...
-      - docker build --build-arg -t $REPOSITORY_URI:latest ./src/Survey
+      - docker build -t $REPOSITORY_URI:latest ./src/Survey
       - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
