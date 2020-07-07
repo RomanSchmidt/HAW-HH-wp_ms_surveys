@@ -9,6 +9,6 @@ RUN apt-get install -y mongodb-org
 #VOLUME ["/data/db"]
 WORKDIR /data
 
-EXPOSE 27018:27018
+EXPOSE 27017
 
 CMD mongod --fork
