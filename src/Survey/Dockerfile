@@ -15,7 +15,8 @@ COPY npm-shrinkwrap.json .
 
 RUN npm install --save-dev
 
-COPY src/ src/
+COPY src/Core src/Core
+COPY src/Survey src/Survey
 
 RUN npm run build
 

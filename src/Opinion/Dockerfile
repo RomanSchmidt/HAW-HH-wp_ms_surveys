@@ -15,7 +15,8 @@ COPY npm-shrinkwrap.json .
 
 RUN npm install --save-dev
 
-COPY src/ src/
+COPY src/Core src/Core
+COPY src/Opinion src/Opinion
 
 RUN npm run build
 #RUN npm run testDot
