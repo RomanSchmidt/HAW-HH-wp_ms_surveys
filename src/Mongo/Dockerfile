@@ -11,4 +11,4 @@ WORKDIR /data
 
 EXPOSE 27018:27018
 
-CMD ["mongod"]
+CMD mongod --fork
