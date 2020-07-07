@@ -1,0 +1,40 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region us-east-1 --no-include-email)
+      - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp_ms_surveys_opinion
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+  build:
+    commands:
+      - echo install dependencies
+      - npm install npm -g --save
+      - npm install pm2 -g --save
+      - npm install ts-node -g --save
+      - npm install source-map-support -g --save
+      - npm install typescript -g --save
+      - npm install mocha -g --save
+      - npm install
+      - npm run build
+      #- echo Starting tests
+      #- npm test
+      - echo Build started on ´date´
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest -f ./src/Opinion/Dockerfile .
+      - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build complete on `date`
+      - echo Pusching the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"opinion","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
