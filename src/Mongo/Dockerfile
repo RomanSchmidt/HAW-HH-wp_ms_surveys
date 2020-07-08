@@ -17,5 +17,7 @@ WORKDIR /data
 #CMD mongod --logpath /var/log/mongodb/mongod.log --dbpath /data/db/
 
 EXPOSE 27017
+EXPOSE 27018
+EXPOSE 27019
 
 CMD ["mongod", "--bind_ip_all"]
