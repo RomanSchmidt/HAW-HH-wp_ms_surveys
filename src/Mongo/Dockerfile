@@ -11,4 +11,7 @@ WORKDIR /data
 
 EXPOSE 27017
 
-CMD mongod --fork
+CMD touch /var/log/mongod.log
+CMD chown mongodb:mongodb /var/log/mongod.log
+
+CMD mongod --logpath /var/log/mongodb/mongod.log --dbpath /data/db/
