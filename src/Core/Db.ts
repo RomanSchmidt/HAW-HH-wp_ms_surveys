@@ -7,6 +7,7 @@ import {ErrorType} from "./Error/ErrorType";
 import Arguments from "./Helper/Arguments";
 import {Environment} from "./Declorator/Environment";
 import App from "./App";
+import Tools from "./Helper/Tools";
 
 @SingletonObject
 export class Db extends AObject {
@@ -35,10 +36,16 @@ export class Db extends AObject {
             uri += '_test';
         }
         this.log('db connecting to:', uri);
-        this._db = await mongoose.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false
-        });
+        try {
+            this._db = await mongoose.connect(uri, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false
+            });
+        } catch (e) {
+            this.logError('can not connect to', uri);
+            await Tools.timeout(1000);
+            await this._connect();
+        }
     }
 }
