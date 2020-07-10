@@ -40,12 +40,14 @@ export default class Controller extends AController {
     };
     public readonly post = {
         index: async (income: ControllerIncome): Promise<{}> => {
-            this.log('WTF!', income.body);
             const body = this._validator.verifyInsertExternal(income.body);
             return this._service.create(body);
         }
     };
     public readonly get = {
+        health: async (_income: ControllerIncome): Promise<{}> => {
+            return {ok: true};
+        },
         index: async (_income: ControllerIncome): Promise<{}> => {
             return this._service.getAll({}, {});
         },

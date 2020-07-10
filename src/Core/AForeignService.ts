@@ -11,7 +11,6 @@ import Tools from "./Helper/Tools";
 type returnType = Promise<CollectionObject | CollectionObject[] | void>;
 
 export default abstract class AForeignService extends AObject {
-    private static _maxConnectionRetries = 10;
     public readonly abstract get: { [key: string]: (...argument: any[]) => returnType };
     public readonly abstract post: { [key: string]: (...argument: any[]) => returnType };
     public readonly abstract put: { [key: string]: (...argument: any[]) => returnType };
@@ -19,7 +18,6 @@ export default abstract class AForeignService extends AObject {
     public readonly abstract delete: { [key: string]: (...argument: any[]) => returnType };
     protected abstract readonly _path: string;
     private _needInit: boolean = true;
-    private _connectionRetry = 0;
 
     public getPath(): string {
         return this._path;
@@ -35,27 +33,27 @@ export default abstract class AForeignService extends AObject {
         await this._connect();
     }
 
-    protected async _performGetRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+    protected async _performGetRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
         return await this._performRequest<T>('GET', param);
     }
 
-    protected async _performPatchRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+    protected async _performPatchRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
         return await this._performRequest<T>('PATCH', param);
     }
 
-    protected async _performPostRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+    protected async _performPostRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
         return await this._performRequest<T>('POST', param);
     }
 
-    protected async _performDeleteRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+    protected async _performDeleteRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
         return await this._performRequest<T>('DELETE', param);
     }
 
-    protected async _performPutRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[]> {
+    protected async _performPutRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
         return await this._performRequest<T>('PUT', param);
     }
 
-    protected async _performRequest<T extends CollectionObject[] | CollectionObject>(method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH', params: ControllerOutgoings): Promise<T> {
+    protected async _performRequest<T extends CollectionObject[] | CollectionObject>(method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH', params: ControllerOutgoings): Promise<T | undefined> {
         let response;
         const url = this._createUrl(params);
         try {
@@ -66,10 +64,8 @@ export default abstract class AForeignService extends AObject {
             });
         } catch (err) {
             if (!(err instanceof AError)) {
-                throw new RequestForeignService({
-                    field: 'Foreign_' + this.constructor.name + '_Service',
-                    type: ErrorType.unknown
-                });
+                this.logError('Foreign_' + this.constructor.name + '_Service not reachable');
+                return undefined;
             } else {
                 throw err;
             }
@@ -103,23 +99,19 @@ export default abstract class AForeignService extends AObject {
     }
 
     private async _connect(): Promise<void> {
+        let returnValue;
         try {
-            await this._performGetRequest({});
+            returnValue = await this._performGetRequest({});
         } catch (e) {
             if (e instanceof RequestForeignService) {
-                ++this._connectionRetry;
-                if (this._connectionRetry > AForeignService._maxConnectionRetries) {
-                    throw e;
-                } else {
-                    this.log('connection retry #' + this._connectionRetry + '  to: ', this.getPath());
-                    await Tools.timeout(1000);
-                    await this._connect();
-                    return;
-                }
+                this.log('connection retry to: ', this.getPath());
+                await Tools.timeout(2000);
+                await this._connect();
+                return;
             } else {
                 throw e;
             }
         }
-        this.log('Foreign Service connected: ' + this.constructor.name);
+        returnValue && this.log('Foreign Service connected: ' + this.constructor.name);
     }
 }

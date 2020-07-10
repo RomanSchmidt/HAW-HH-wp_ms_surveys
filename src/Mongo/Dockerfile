@@ -10,12 +10,6 @@ RUN rm -rf /var/lib/apt/lists/
 VOLUME ["/data/db"]
 WORKDIR /data
 
-
-#CMD touch /var/log/mongod.log
-#CMD chown mongodb:mongodb /var/log/mongod.log
-
-#CMD mongod --logpath /var/log/mongodb/mongod.log --dbpath /data/db/
-
 EXPOSE 27017
 EXPOSE 27018
 EXPOSE 27019

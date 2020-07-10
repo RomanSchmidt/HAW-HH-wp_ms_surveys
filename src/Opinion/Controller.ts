@@ -37,6 +37,9 @@ export default class Controller extends AController {
         }
     };
     public readonly get = {
+        health: async (_income: ControllerIncome): Promise<{}> => {
+            return {ok: true};
+        },
         index: async (income: ControllerIncome): Promise<{}> => {
             if ('surveyId' in income.query) {
                 const surveyId = this._validator.convertMongoIdString(income.query.surveyId);
