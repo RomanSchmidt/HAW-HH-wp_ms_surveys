@@ -6,8 +6,12 @@ before_script:
   - npm install typescript -g --save
   - npm install ts-node -g --save
 
+include:
+  - template: AWS/Deploy-ECS.gitlab-ci.yml
+
 stages:
   - build
+  - build-and-push-container-stage
   #- test
 
 services:
@@ -19,6 +23,9 @@ cache:
 
 variables:
   MONGODB_VERSION: "4.2"
+  CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
+  CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
+  CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
 
 install_dependencies:
   stage: build
@@ -30,6 +37,18 @@ install_dependencies:
     when: on_success
     paths:
       - node_modules/
+      - src/
+
+build-and-push-container-stage:
+  stage: build-and-push-container-stage
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  before_script:
+    - export SERVICE_NAME=survey
+    - export SERVICE_NAME2=opinion
+  script:
+
+  dependencies:
+    - compile-and-test-stage
 
 #testing_testing:
 #  stage: test
