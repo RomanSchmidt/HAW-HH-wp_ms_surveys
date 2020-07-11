@@ -18,6 +18,7 @@ export class CreateSurvey extends AObject {
         before(async () => {
             const model = new Model();
             await model.init();
+            //console.log('model.getDb()', model.getDb());
             await model.getDb()?.deleteMany({});
         });
     }
@@ -197,7 +198,7 @@ export class CreateSurvey extends AObject {
             false.should.be.true('no exception');
         });
 
-        it('should not save without title in answer', async () => {
+        it('should not save with invalid title in answer', async () => {
             try {
                 await new Service().create({
                     title: 'survey1',

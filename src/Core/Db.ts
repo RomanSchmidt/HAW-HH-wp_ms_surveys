@@ -44,6 +44,9 @@ export class Db extends AObject {
             });
             this.log('db connected to:', uri);
         } catch (e) {
+            if(App.ENVIRONMENT == Environment.Test) {
+                throw e;
+            }
             this.logError('can not connect to', uri);
             await Tools.timeout(1000);
             await this._connect();
