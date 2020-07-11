@@ -1,3 +1,6 @@
+import {Environment} from "../Declorator/Environment";
+import Arguments from "./Arguments";
+
 export default abstract class Tools {
 
     private constructor() {
@@ -29,5 +32,12 @@ export default abstract class Tools {
             returnValue += ' ' + [hours, minutes, seconds, milliseconds].join(':')
         }
         return returnValue;
+    }
+
+    static getEnvironment(): Environment {
+        return typeof global.it === 'function' ? Environment.Test :
+            Arguments.get('ENVIRONMENT').ENVIRONMENT == Environment.Production ? Environment.Production :
+                Environment.Development
+
     }
 }

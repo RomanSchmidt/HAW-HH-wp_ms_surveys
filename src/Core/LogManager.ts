@@ -1,7 +1,11 @@
 import Tools from "./Helper/Tools";
+import {Environment} from "./Declorator/Environment";
 
 export default class LogManager {
     public log(description: string, ...elements: any[]): void {
+        if (Tools.getEnvironment() == Environment.Test) {
+            return;
+        }
         const messagePrefix: string = this._getMessagePrefix();
         elements.length ?
             console.log(messagePrefix, description, ' <-> ', ...elements) :

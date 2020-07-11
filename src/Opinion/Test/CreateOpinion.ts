@@ -26,6 +26,7 @@ export class CreateOpinion extends AObject {
     }
 
     private _run(): void {
+        return;
         it('should create survey', async () => {
             this._survey = <any>await new Survey().post.create({
                 title: 'foo',
