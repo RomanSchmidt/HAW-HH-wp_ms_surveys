@@ -42,6 +42,7 @@ export class Db extends AObject {
                 useUnifiedTopology: true,
                 useFindAndModify: false
             });
+            this.log('db connected to:', uri);
         } catch (e) {
             this.logError('can not connect to', uri);
             await Tools.timeout(1000);
