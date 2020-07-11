@@ -39,16 +39,16 @@ install_dependencies:
       - node_modules/
       - src/
 
-build-and-push-container-stage:
-  stage: build-and-push-container-stage
-  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-  before_script:
-    - export SERVICE_NAME=survey
-    - export SERVICE_NAME2=opinion
-  script:
-
-  dependencies:
-    - compile-and-test-stage
+#build-and-push-container-stage:
+#  stage: build-and-push-container-stage
+#  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+#  before_script:
+#    - export SERVICE_NAME=survey
+#    - export SERVICE_NAME2=opinion
+#  script:
+#
+#  dependencies:
+#    - compile-and-test-stage
 
 #testing_testing:
 #  stage: test
