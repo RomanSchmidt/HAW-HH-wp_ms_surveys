@@ -9,32 +9,31 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region us-east-1 --no-include-email)
-      - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp_ms_surveys_survey
+      - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp_ms_surveys_survey # uri of ECR
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
     commands:
       - echo install dependencies
-      - npm install npm -g --save
-      - npm install pm2 -g --save
-      - npm install ts-node -g --save
-      - npm install source-map-support -g --save
-      - npm install typescript -g --save
-      - npm install mocha -g --save
-      - npm install
-      - npm run build
-      #- echo Starting tests
+      - npm install npm -g –-save # update npm
+      - npm install pm2 -g –-save # install a deamon which will handle the node.js instance
+      - npm install ts-node -g –-save # global package to run mocha with ts support
+      - npm install source-map-support -g –-save # global package to transfer js stack trace mapping to ts
+      - npm install typescript -g –-save # type script as global package
+      - npm install mocha -g –-save # mocha for testing
+      - npm install # install every thing from package.json
+      - npm run build # running the defined action in the package.json to build with typescript
       #- npm test
       - echo Build started on ´date´
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile .
-      - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
+      - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
   post_build:
     commands:
       - echo Build complete on `date`
       - echo Pusching the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest # push to aws as latest tag
+      - docker push $REPOSITORY_URI:$IMAGE_TAG # push to aws as regular tag
       - echo Writing image definitions file...
-      - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"wp-ms-surveys-opinion-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
 artifacts:
-  files: imagedefinitions.json
+  files: imagedefinitions.json # add the created file to the docker image
