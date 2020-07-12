@@ -101,7 +101,7 @@ export default abstract class AForeignService extends AObject {
     private async _connect(): Promise<void> {
         let returnValue;
         try {
-            returnValue = await this._performGetRequest({});
+            returnValue = await this._performGetRequest({params: ['health']});
         } catch (e) {
             if (e instanceof RequestForeignService) {
                 this.log('connection retry to: ', this.getPath());
