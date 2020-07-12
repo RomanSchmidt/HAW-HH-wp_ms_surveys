@@ -6,8 +6,8 @@ before_script:
   - npm install typescript -g --save
   - npm install ts-node -g --save
 
-include:
-  - template: AWS/Deploy-ECS.gitlab-ci.yml
+#include:
+#  - template: AWS/Deploy-ECS.gitlab-ci.yml
 
 stages:
   - build
