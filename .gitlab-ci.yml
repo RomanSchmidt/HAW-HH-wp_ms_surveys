@@ -11,7 +11,7 @@ include:
 
 stages:
   - build
-  - build-and-push-container-stage
+  #- build-and-push-container-stage
   #- test
 
 services:
