@@ -1,12 +1,12 @@
 import AObject from "./AObject";
 import AController from "./AController";
 import * as express from "express";
-import ErrorHandler from "./ErrorHandler";
+import ErrorHandler from "./Helper/ErrorHandler";
 import {Db} from "./Db";
 import Arguments from "./Helper/Arguments";
-import {Environment} from "./Declorator/Environment";
+import {Environment} from "./Declarator/Environment";
 import InternalServerError from "./Error/InternalServerError";
-import {ErrorType} from "./Error/ErrorType";
+import {ErrorType} from "./Declarator/ErrorType";
 import AForeignService from "./AForeignService";
 import Tools from "./Helper/Tools";
 import compression = require("compression");
@@ -63,8 +63,8 @@ export default class App extends AObject {
         this.log('adding route', method.toUpperCase() + ' -> /' + controller.getPath() + '/' + actionName);
 
         const router = this._getRouter(controller.getPath());
-        router[method]('/' + actionName, (req, res) => {
-            controller[method][functionName]({
+        router[method]('/' + actionName, async (req, res) => {
+            await controller[method][functionName]({
                 body: req.body,
                 params: req.params,
                 query: req.query
@@ -73,10 +73,16 @@ export default class App extends AObject {
                     res.status(200).json({error: null, success: result === undefined ? null : result});
                 })
                 .catch((err: Error) => {
-                    const analyzeResult = this._errorHandler.analyze(err);
+                    let analyzeResult
+                    try {
+                        analyzeResult = this._errorHandler.analyze(err);
+                    } catch (e) {
+                        this.logError('unknown Error', err);
+                        res.status(500).json({error: err.message, success: null});
+                        return;
+                    }
                     if (analyzeResult.status >= 500) {
                         this.logError('internal Exception', err);
-
                     }
                     res.status(analyzeResult.status).json({error: analyzeResult.message, success: null});
                 })

@@ -1,9 +1,9 @@
 import AController from "../Core/AController";
-import {ControllerIncome} from "../Core/Declorator/ControllerIncome";
+import {ControllerIncome} from "../Core/Declarator/ControllerIncome";
 import Service from "./Service";
 import BadRequest from "../Core/Error/BadRequest";
 import Survey from "./Validator/Survey";
-import {ErrorType} from "../Core/Error/ErrorType";
+import {ErrorType} from "../Core/Declarator/ErrorType";
 
 export default class Controller extends AController {
     protected readonly _path = 'survey';
@@ -14,7 +14,7 @@ export default class Controller extends AController {
             const id = this._validator.convertMongoIdString(income.params.id);
             if (id) {
                 const query = this._validator.verifyIncreaseExternal(income.query);
-                return this._service.increase(id, query);
+                return await this._service.increase(id, query);
             }
             throw new BadRequest({field: 'id', type: ErrorType.invalid});
         }
@@ -23,7 +23,7 @@ export default class Controller extends AController {
         ':id': async (income: ControllerIncome): Promise<{}> => {
             const id = this._validator.convertMongoIdString(income.params.id);
             if (id) {
-                return this._service.remove(id);
+                return await this._service.remove(id);
             }
             throw new BadRequest({field: 'id', type: ErrorType.invalid});
         }
@@ -33,7 +33,7 @@ export default class Controller extends AController {
             const id = this._validator.convertMongoIdString(income.params.id);
             if (id) {
                 const body = this._validator.verifyUpdateExternal(income.body);
-                return this._service.update(id, body);
+                return await this._service.update(id, body);
             }
             throw new BadRequest({field: 'id', type: ErrorType.invalid});
         }
@@ -49,11 +49,11 @@ export default class Controller extends AController {
             return {ok: true};
         },
         index: async (_income: ControllerIncome): Promise<{}> => {
-            return this._service.getAll({}, {});
+            return await this._service.getAll({}, {});
         },
         ':id': async (income: ControllerIncome): Promise<{}> => {
             if (this._validator.convertMongoIdString(income.params.id)) {
-                return this._service.getById(income.params.id, {});
+                return await this._service.getById(income.params.id, {});
             }
             throw new BadRequest({field: 'id', type: ErrorType.invalid});
         }

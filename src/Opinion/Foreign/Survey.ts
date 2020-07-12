@@ -1,7 +1,7 @@
 import AForeignService from "../../Core/AForeignService";
 import {SingletonObject} from "../../Core/Decorator/SingletonObject";
 import * as mongoose from "mongoose";
-import {CollectionObject} from "../../Core/Declorator/CollectionObject";
+import {CollectionObject} from "../../Core/Declarator/CollectionObject";
 import Arguments from "../../Core/Helper/Arguments";
 
 @SingletonObject

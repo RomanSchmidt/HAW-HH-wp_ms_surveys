@@ -1,13 +1,13 @@
 import AService from "../Core/AService";
 import Model from "./Model";
 import {SingletonObject} from "../Core/Decorator/SingletonObject";
-import {CollectionObject} from "../Core/Declorator/CollectionObject";
+import {CollectionObject} from "../Core/Declarator/CollectionObject";
 import {ObjectId} from "mongodb";
-import BadRequest from "../Core/Error/BadRequest";
-import {ErrorType} from "../Core/Error/ErrorType";
+import {ErrorType} from "../Core/Declarator/ErrorType";
 import Survey from "./Foreign/Survey";
 import * as mongoose from "mongoose";
 import {Types} from "mongoose";
+import UnknownResource from "../Core/Error/UnknownResource";
 
 @SingletonObject
 export default class Service extends AService<Model> {
@@ -24,7 +24,7 @@ export default class Service extends AService<Model> {
     public async update<T extends CollectionObject>(id: ObjectId, projection: T): Promise<T> {
         const res = await this._model.updateById(id, projection);
         if (undefined == res) {
-            throw new BadRequest({field: 'opinionId', type: ErrorType.unknown});
+            throw new UnknownResource({field: 'opinionId', type: ErrorType.unknown});
         }
         return res;
     }
@@ -32,7 +32,7 @@ export default class Service extends AService<Model> {
     public async getBySurveyId(surveyId: ObjectId, projection: {}): Promise<CollectionObject[]> {
         const res = await this._model.getBySurveyId(surveyId, projection);
         if (undefined == res) {
-            throw new BadRequest({field: 'opinionId', type: ErrorType.unknown});
+            throw new UnknownResource({field: 'opinionId', type: ErrorType.unknown});
         }
         return res;
     }

@@ -1,4 +1,4 @@
-import LogManager from "./LogManager";
+import LogManager from "./Helper/LogManager";
 
 export default abstract class AObject {
     private readonly _logManager: LogManager;

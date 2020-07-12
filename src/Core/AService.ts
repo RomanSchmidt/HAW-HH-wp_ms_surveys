@@ -3,7 +3,7 @@ import AModel from "./AModel";
 import * as mongoose from "mongoose";
 import AValidator from "./AValidator";
 import ASchema from "./ASchema";
-import {CollectionObject} from "./Declorator/CollectionObject";
+import {CollectionObject} from "./Declarator/CollectionObject";
 
 export default abstract class AService<T extends AModel<AValidator, ASchema>> extends AObject {
     protected _model: T;
@@ -21,18 +21,18 @@ export default abstract class AService<T extends AModel<AValidator, ASchema>> ex
     public async getById<Result = {}>(
         id: mongoose.Types.ObjectId,
         projection: { [key: string]: boolean }
-    ): Promise<Result> {
-        return this._model.getById(id, projection);
+    ): Promise<Result | undefined> {
+        return await this._model.getById(id, projection);
     }
 
     public async getAll<Result extends CollectionObject>(
         filter: { [key: string]: typeof mongoose.Types },
         projection: { [key: string]: boolean }
     ): Promise<Result[]> {
-        return this._model.getAll(filter, projection);
+        return await this._model.getAll(filter, projection);
     }
 
     public async increase<T extends { [key: string]: number }>(id: mongoose.Types.ObjectId, payload: T): Promise<T> {
-        return this._model.increaseById(id, payload);
+        return await this._model.increaseById(id, payload);
     }
 }

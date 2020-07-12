@@ -3,21 +3,26 @@ import * as mongoose from "mongoose";
 import ASchema from "./ASchema";
 import InternalServerError from "./Error/InternalServerError";
 import {SingletonObject} from "./Decorator/SingletonObject";
-import {ErrorType} from "./Error/ErrorType";
+import {ErrorType} from "./Declarator/ErrorType";
 import Arguments from "./Helper/Arguments";
-import {Environment} from "./Declorator/Environment";
+import {Environment} from "./Declarator/Environment";
 import App from "./App";
 import Tools from "./Helper/Tools";
 
 @SingletonObject
 export class Db extends AObject {
     private _db: mongoose.Mongoose | undefined;
+    private _needInit: boolean = true;
 
     public constructor() {
         super();
     }
 
     public async init(): Promise<void> {
+        if(!this._needInit) {
+            return;
+        }
+        this._needInit = false;
         await super.init();
         await this._connect();
     }
@@ -31,7 +36,7 @@ export class Db extends AObject {
     }
 
     private async _connect(): Promise<void> {
-        let uri = Arguments.get('MONGO_URI').MONGO_URI || 'mongodb://localhost:27017/wp_ms_surveys';
+        let uri = Arguments.get('MONGO_URI').MONGO_URI || 'mongodb://localhost:27017/wp-ms-surveys';
         if (App.ENVIRONMENT === Environment.Test) {
             uri += '_test';
         }

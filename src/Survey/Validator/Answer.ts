@@ -1,7 +1,7 @@
 import AValidator from "../../Core/AValidator";
 import {SingletonObject} from "../../Core/Decorator/SingletonObject";
-import {CollectionObject} from "../../Core/Declorator/CollectionObject";
-import {ErrorContainer} from "../../Core/Declorator/ErrorContainer";
+import {CollectionObject} from "../../Core/Declarator/CollectionObject";
+import {ErrorContainer} from "../../Core/Declarator/ErrorContainer";
 
 @SingletonObject
 export default class Answer extends AValidator {

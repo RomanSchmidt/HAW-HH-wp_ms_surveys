@@ -1,7 +1,7 @@
 import * as should from "should";
 import AObject from "../../Core/AObject";
 import Service from "../Service";
-import {ErrorType} from "../../Core/Error/ErrorType";
+import {ErrorType} from "../../Core/Declarator/ErrorType";
 import Model from "../Model";
 
 export class CreateSurvey extends AObject {

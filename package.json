@@ -1,5 +1,5 @@
 {
-  "name": "wp_ms_surveys",
+  "name": "wp-ms-surveys",
   "version": "1.0.0",
   "description": "creat and answer surveys",
   "main": "dist/index.js",
@@ -34,13 +34,15 @@
   },
   "scripts": {
     "test": "mocha dist/Survey/Test && mocha dist/Opinion/Test",
+    "testSurvey": "mocha dist/Survey/Test",
+    "testOpinion": "mocha dist/Opinion/Test",
     "testDotSurvey": "mocha dist/Survey/Test --reporter dot",
     "testDotOpinion": "mocha dist/Opinion/Test --reporter dot",
     "build": "rm -rf ./dist && tsc"
   },
   "repository": {
     "type": "git",
-    "url": "https://git.haw-hamburg.de/acn887/wp_ms_surveys.git"
+    "url": "https://git.haw-hamburg.de/acn887/wp-ms-surveys.git"
   },
   "author": "Roman Schmidt",
   "license": "ISC",

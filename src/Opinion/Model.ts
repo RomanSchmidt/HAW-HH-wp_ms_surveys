@@ -3,7 +3,7 @@ import Validator from "./Validator";
 import Schema from "./Schema";
 import {SingletonObject} from "../Core/Decorator/SingletonObject";
 import {ObjectId} from "mongodb";
-import {CollectionObject} from "../Core/Declorator/CollectionObject";
+import {CollectionObject} from "../Core/Declarator/CollectionObject";
 
 @SingletonObject
 export default class Model extends AModel<Validator, Schema> {

@@ -1,3 +1,3 @@
-import {ErrorType} from "../Error/ErrorType";
+import {ErrorType} from "./ErrorType";
 
 export type ErrorMessage = { field: string, type: ErrorType };

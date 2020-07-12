@@ -1,10 +1,10 @@
 import AObject from "./AObject";
 import InternalServerError from "./Error/InternalServerError";
-import {ErrorType} from "./Error/ErrorType";
+import {ErrorType} from "./Declarator/ErrorType";
 import AError from "./Error/AError";
 import fetch from "node-fetch";
-import {ControllerOutgoings} from "./Declorator/ControllerOutgoings";
-import {CollectionObject} from "./Declorator/CollectionObject";
+import {ControllerOutgoings} from "./Declarator/ControllerOutgoings";
+import {CollectionObject} from "./Declarator/CollectionObject";
 import RequestForeignService from "./Error/ConnectForeignService";
 import Tools from "./Helper/Tools";
 

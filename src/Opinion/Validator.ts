@@ -1,9 +1,9 @@
 import AValidator from "../Core/AValidator";
 import NotImplemented from "../Core/Error/NotImplemented";
-import {CollectionObject} from "../Core/Declorator/CollectionObject";
+import {CollectionObject} from "../Core/Declarator/CollectionObject";
 import {SingletonObject} from "../Core/Decorator/SingletonObject";
-import {ErrorType} from "../Core/Error/ErrorType";
-import {ErrorContainer} from "../Core/Declorator/ErrorContainer";
+import {ErrorType} from "../Core/Declarator/ErrorType";
+import {ErrorContainer} from "../Core/Declarator/ErrorContainer";
 import {Types} from "mongoose";
 
 @SingletonObject
@@ -43,7 +43,6 @@ export default class Validator extends AValidator {
 
         return this._verifyExternal(errors, cleanedPayload);
     }
-
 
     public verifyUpdateExternal<T extends CollectionObject>(payload: T = <T>{}): typeof payload {
         throw new NotImplemented({field: 'updateExternalOpinion', type: ErrorType.empty});

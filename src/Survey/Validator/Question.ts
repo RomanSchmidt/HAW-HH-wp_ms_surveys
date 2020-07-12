@@ -1,7 +1,7 @@
 import AValidator from "../../Core/AValidator";
-import {CollectionObject} from "../../Core/Declorator/CollectionObject";
+import {CollectionObject} from "../../Core/Declarator/CollectionObject";
 import {SingletonObject} from "../../Core/Decorator/SingletonObject";
-import {ErrorContainer} from "../../Core/Declorator/ErrorContainer";
+import {ErrorContainer} from "../../Core/Declarator/ErrorContainer";
 import Answer from "./Answer";
 
 @SingletonObject

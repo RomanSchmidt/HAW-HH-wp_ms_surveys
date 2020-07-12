@@ -1,12 +1,13 @@
 import AObject from "./AObject";
-import {ControllerIncome} from "./Declorator/ControllerIncome";
+import {ControllerIncome} from "./Declarator/ControllerIncome";
 import AService from "./AService";
 import AModel from "./AModel";
 import AValidator from "./AValidator";
 import ASchema from "./ASchema";
 
 /**
- * register your self and your actions to app
+ * define the path to can be reached, and all methods that will be set up to apis
+ * a service is needed. it will be initialized automatically.
  */
 export default abstract class AController extends AObject {
 

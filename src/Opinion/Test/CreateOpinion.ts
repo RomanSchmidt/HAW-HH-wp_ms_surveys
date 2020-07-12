@@ -2,7 +2,7 @@ import * as should from "should";
 import AObject from "../../Core/AObject";
 import Model from "../Model";
 import Service from "../Service";
-import {ErrorType} from "../../Core/Error/ErrorType";
+import {ErrorType} from "../../Core/Declarator/ErrorType";
 import Survey from "../Foreign/Survey";
 import {Types} from "mongoose";
 
@@ -26,7 +26,6 @@ export class CreateOpinion extends AObject {
     }
 
     private _run(): void {
-        return;
         it('should create survey', async () => {
             this._survey = <any>await new Survey().post.create({
                 title: 'foo',

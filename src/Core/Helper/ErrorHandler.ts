@@ -1,8 +1,8 @@
-import AObject from "./AObject";
-import AError from "./Error/AError";
-import {ErrorResult} from "./Declorator/ErrorResult";
-import {Environment} from "./Declorator/Environment";
-import App from "./App";
+import AObject from "../AObject";
+import AError from "../Error/AError";
+import {ErrorResult} from "../Declarator/ErrorResult";
+import {Environment} from "../Declarator/Environment";
+import App from "../App";
 
 export default class ErrorHandler extends AObject {
 

@@ -1,5 +1,5 @@
-import Tools from "./Helper/Tools";
-import {Environment} from "./Declorator/Environment";
+import Tools from "./Tools";
+import {Environment} from "../Declarator/Environment";
 
 export default class LogManager {
     public log(description: string, ...elements: any[]): void {

@@ -1,6 +1,6 @@
-import {ErrorContainer} from "../Declorator/ErrorContainer";
-import {ErrorMessage} from "../Declorator/ErrorMessage";
-import {ErrorResult} from "../Declorator/ErrorResult";
+import {ErrorContainer} from "../Declarator/ErrorContainer";
+import {ErrorMessage} from "../Declarator/ErrorMessage";
+import {ErrorResult} from "../Declarator/ErrorResult";
 
 export default abstract class AError extends Error {
     protected abstract readonly _status: number;

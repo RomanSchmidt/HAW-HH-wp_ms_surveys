@@ -1,9 +1,9 @@
 import AObject from "./AObject";
 import * as mongoose from "mongoose";
 import validator from "validator";
-import {CollectionObject} from "./Declorator/CollectionObject";
-import {ErrorType} from "./Error/ErrorType";
-import {ErrorContainer} from "./Declorator/ErrorContainer";
+import {CollectionObject} from "./Declarator/CollectionObject";
+import {ErrorType} from "./Declarator/ErrorType";
+import {ErrorContainer} from "./Declarator/ErrorContainer";
 import BadRequest from "./Error/BadRequest";
 import AError from "./Error/AError";
 import InternalServerError from "./Error/InternalServerError";

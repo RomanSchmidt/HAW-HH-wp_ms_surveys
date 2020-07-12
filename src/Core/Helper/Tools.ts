@@ -1,4 +1,4 @@
-import {Environment} from "../Declorator/Environment";
+import {Environment} from "../Declarator/Environment";
 import Arguments from "./Arguments";
 
 export default abstract class Tools {
@@ -38,6 +38,6 @@ export default abstract class Tools {
         return typeof global.it === 'function' ? Environment.Test :
             Arguments.get('ENVIRONMENT').ENVIRONMENT == Environment.Production ? Environment.Production :
                 Environment.Development
-
+        ;
     }
 }

@@ -4,8 +4,8 @@ import ASchema from "./ASchema";
 import {Db} from "./Db";
 import * as mongoose from "mongoose";
 import InternalServerError from "./Error/InternalServerError";
-import {CollectionObject} from "./Declorator/CollectionObject";
-import {ErrorType} from "./Error/ErrorType";
+import {CollectionObject} from "./Declarator/CollectionObject";
+import {ErrorType} from "./Declarator/ErrorType";
 import BadRequest from "./Error/BadRequest";
 
 export default abstract class AModel<T extends AValidator, V extends ASchema> extends AObject {
@@ -48,7 +48,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     }
 
     public async updateById<T extends CollectionObject>(id: mongoose.Types.ObjectId, body: T): Promise<typeof body | undefined> {
-        return this.update({_id: id}, body);
+        return await this.update({_id: id}, body);
     }
 
     public async update<T extends CollectionObject>(filter: { [key: string]: any }, payload: T): Promise<T | undefined> {
@@ -96,8 +96,6 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
             select[index] = 1;
         }
         const cleanedPayload = this._validator.verifyIncrease(payload);
-        this.log('1', cleanedPayload);
-
         const result = await this._db.findOneAndUpdate({_id: id}, {$inc: cleanedPayload}, {
             lean: true,
             new: true,
