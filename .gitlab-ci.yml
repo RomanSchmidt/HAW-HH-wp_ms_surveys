@@ -141,9 +141,9 @@ building_survey:
     #- apk --no-cache add tzdata openntpd
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
-    #- IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    #- echo login
-    #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
+    - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    - echo "login = $REPOSITORY_URI -> $IMAGE_TAG"
+    - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$CI_BUILD_REF_NAME" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile .
