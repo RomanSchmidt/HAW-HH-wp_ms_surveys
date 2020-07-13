@@ -12,6 +12,7 @@ variables:
   ENVIRONMENT: test
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
+  NODE_ENV: 'test'
 
 image: node:$NODEJS_VERSION
 
@@ -51,6 +52,10 @@ build:
 
 testing_all:
   stage: test
+  services:
+    - mongo:latest
+  dependencies:
+    - build
   script:
     - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION --PORT=$PORT_SURVEY --ENVIRONMENT=$ENVIRONMENT $DIST_PATH_SURVEY
     - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION --ENVIRONMENT=$ENVIRONMENT $DIST_PATH_OPINION
