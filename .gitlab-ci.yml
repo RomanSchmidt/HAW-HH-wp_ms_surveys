@@ -49,8 +49,8 @@ build_local:
   image: docker:19.03.5
   stage: build_local
   before_script:
-    - apt get update
-    - apt get install npm
+    - apt-get update
+    - apt-get install npm
     - npm install
     - npm install source-map-support -g --save
     - npm install typescript -g --save
