@@ -1,4 +1,4 @@
-image: docker:git
+image: docker:19.03.5
 
 variables:
   #DOCKER_DRIVER: overlay
@@ -30,7 +30,7 @@ stages:
 
 services:
   - mongo:$MONGODB_VERSION
-  - docker:dind
+  - docker:19.03.5-dind
 
 cache:
   paths:
