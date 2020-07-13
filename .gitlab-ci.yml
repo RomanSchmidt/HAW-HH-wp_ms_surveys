@@ -157,8 +157,9 @@ building_survey:
   after_script:
     - echo Build complete on `date`
     - echo Pusching the Docker images...
-    - docker push $REPOSITORY_URI:latest # push to aws as latest tag
-    - docker push $REPOSITORY_URI:$IMAGE_TAG # push to aws as regular tag
+    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    - docker push $REPOSITORY_URI:latest
     - echo Writing image definitions file...
     - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
   artifacts:
