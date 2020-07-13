@@ -102,6 +102,8 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
+    - PATH=/usr/local/bin:$PATH
+    - hash -r
     - echo Logging in to Amazon ECR...
     - aws --version
     - $(aws ecr get-login --region us-east-1 --no-include-email)
