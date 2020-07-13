@@ -72,15 +72,16 @@ testing_survey:
   dependencies:
     - build_local
   before_script:
-    - npm install
+    - npm install -D
     - npm install source-map-support -g --save
     - npm install typescript -g --save
     - npm install typescript -g --save
     - npm install ts-node -g --save
     - npm install pm2 -g --save
+    - npm install mocha -g --save
   script:
     - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "development"
-    - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_PM2 --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY --reporter dot
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_PM2 --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
     - pm2 kill
 
 testing_opinion:
@@ -91,15 +92,16 @@ testing_opinion:
   dependencies:
     - build_local
   before_script:
-    - npm install
+    - npm install -D
     - npm install source-map-support -g --save
     - npm install typescript -g --save
     - npm install typescript -g --save
     - npm install ts-node -g --save
     - npm install pm2 -g --save
+    - npm install mocha -g --save
   script:
     - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "development"
-    - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION --reporter dot
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
 #building_mongo:
