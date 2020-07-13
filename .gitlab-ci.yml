@@ -143,7 +143,7 @@ building_survey:
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
     - echo "login = $REPOSITORY_URI -> $CI_BUILD_REF -> $IMAGE_TAG"
-    #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
+    - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
