@@ -120,9 +120,9 @@ building_survey:
   tags:
     - dind
     - docker
-  image: docker:19.03.11
+  image: docker:19.03.12
   services:
-    - docker:19.03.11-dind
+    - docker:19.03.12-dind
   dependencies:
     - build_local
     - testing_survey
