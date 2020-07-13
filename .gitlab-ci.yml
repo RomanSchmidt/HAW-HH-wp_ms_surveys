@@ -139,6 +139,7 @@ building_survey:
     #- export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     # use AWS
     - echo Logging in to Amazon ECR...
+    - aws configure list
     - aws --version
     - rm -rf ~/.aws/config -R
     - $(aws ecr get-login --region us-east-1 --no-include-email)
