@@ -125,7 +125,8 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
-    #- docker info
+    # install aws
+    - pip install awscli
     - echo Logging in to Amazon ECR...
     - aws --version
     - $(aws ecr get-login --region us-east-1 --no-include-email)
@@ -137,6 +138,7 @@ building_survey:
   script:
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -f src/Survey/Dockerfile --no-cache -t $REPOSITORY_URI:latest .
+    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
     #- docker push $REPO:$CI_BUILD_REF_NAME
   #post build
   after_script:
