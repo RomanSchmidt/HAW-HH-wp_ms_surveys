@@ -4,8 +4,8 @@ variables:
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
   #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
-  MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys
-  MONGO_URI_MOCHA: mongodb://localhost:27017/wp-ms-surveys_test
+  MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys_test
+  MONGO_URI_MOCHA: mongodb://localhost:27017/wp-ms-surveys
   PORT_SURVEY_PM2: 8090
   PORT_SURVEY_MOCHA: 8080
   PORT_OPINION_PM2: 8091
@@ -16,7 +16,6 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
-  NODE_ENV: test
 
 image: node:$NODEJS_VERSION
 
