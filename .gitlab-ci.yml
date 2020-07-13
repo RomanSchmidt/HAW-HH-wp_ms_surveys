@@ -116,9 +116,9 @@ testing_opinion:
 
 building_survey:
   #image: gitlab/dind
-  image: docker
+  image: docker:19.03.1
   services:
-    - docker:dind
+    - docker:dind:19.03.1-dind
   stage: build_and_push_docker
   dependencies:
     - build_local
