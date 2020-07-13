@@ -31,6 +31,8 @@ export class CreateOpinion extends AObject {
                 title: 'foo',
                 questions: [{title: 'A or B', answers: [{'title': 'A'}, {'title': 'B'}]}]
             });
+            this._survey.should.be.an.Object();
+            this._survey.should.have.property('_id');
         })
 
         it('should not save with empty payload', async () => {
