@@ -125,7 +125,7 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
-    - #docker info
+    #- docker info
     - echo Logging in to Amazon ECR...
     - aws --version
     - $(aws ecr get-login --region us-east-1 --no-include-email)
