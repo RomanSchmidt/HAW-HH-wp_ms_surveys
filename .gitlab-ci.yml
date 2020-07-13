@@ -46,11 +46,9 @@ cache:
 #  - npm install pm2 -g --save
 
 build_local:
-  image: docker:19.03.5
+  image: node:12.18.2-slim
   stage: build_local
   before_script:
-    - apt-get update
-    - apt-get install npm
     - npm install
     - npm install source-map-support -g --save
     - npm install typescript -g --save
