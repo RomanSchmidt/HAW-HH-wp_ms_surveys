@@ -128,7 +128,7 @@ building_survey:
     # install python
     - apk update
     - apk upgrade
-    - apk add util-linux pcutils usbutils coreutils binutils findutils grep
+    - apk add util-linux pciutils usbutils coreutils binutils findutils grep
     - apk add python python-dev py-pip
     # install aws
     - pip install awscli
