@@ -136,7 +136,10 @@ building_survey:
     - echo Logging in to Amazon ECR...
     #- aws configure list
     - aws --version
-    - rm -rf ~/.aws/config -R
+    - service ntpd stop
+    - ntpdate time.nist.gov
+    - service ntpd start
+    - ntpstat
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
