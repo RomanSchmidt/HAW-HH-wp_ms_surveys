@@ -20,8 +20,6 @@ COPY src/Opinion src/Opinion
 
 RUN npm run build
 
-EXPOSE "$PORT"
-
-ENV NODE_ENV "$ENVIRONMENT"
+EXPOSE "test"
 
 RUN mocha --MONGO_URI="$MONGO_URI" --FOREIGN_SERVICE_OPINION="$FOREIGN_SERVICE_OPINION" --PORT="$PORT" --ENVIRONMENT="test" dist/Opinion/Test

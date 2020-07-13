@@ -26,6 +26,11 @@ export class CreateOpinion extends AObject {
     }
 
     private _run(): void {
+        it('should init Service', async function() {
+            this.timeout(5000);
+            await new Service().init();
+        });
+
         it('should create survey', async () => {
             this._survey = <any>await new Survey().post.create({
                 title: 'foo',

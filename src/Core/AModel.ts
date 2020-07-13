@@ -12,6 +12,7 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     protected _db: mongoose.Model<mongoose.Document> = <any>undefined;
     private readonly _validator: T;
     private readonly _schema: V;
+    private _shouldInit: boolean = true;
 
     protected constructor(validator: T, schema: V) {
         super();
@@ -20,6 +21,10 @@ export default abstract class AModel<T extends AValidator, V extends ASchema> ex
     }
 
     async init(): Promise<void> {
+        if (!this._shouldInit) {
+            return;
+        }
+        this._shouldInit = false;
         await super.init();
         const db = new Db();
         await db.init();

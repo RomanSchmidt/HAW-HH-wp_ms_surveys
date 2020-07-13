@@ -5,14 +5,13 @@ variables:
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
   #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
   MONGO_URI: mongodb://mongo:27017/wp-ms-surveys
-  FOREIGN_SERVICE_OPINION: http://opinionservice:8081/opinion
-  FOREIGN_SERVICE_SURVEY:  http://opinionservice:8080/survey
+  FOREIGN_SERVICE_OPINION: http://localhost:8081/opinion
+  FOREIGN_SERVICE_SURVEY: http://localhost:8080/survey
   PORT_SURVEY: 8080
   PORT_OPINION: 8081
   ENVIRONMENT: test
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
-  NODE_ENV: 'test'
 
 image: node:$NODEJS_VERSION
 

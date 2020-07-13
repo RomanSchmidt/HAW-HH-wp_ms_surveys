@@ -15,6 +15,11 @@ export default class Service extends AService<Model> {
         super(new Model());
     }
 
+    public async init(): Promise<void> {
+        await new Survey().init();
+        await super.init();
+    }
+
     public async create<T extends CollectionObject>(body: T): Promise<T> {
         const newOpinion = await this._model.insert(body);
         await new Survey().patch.incUserCounter(<Types.ObjectId>body.surveyId);

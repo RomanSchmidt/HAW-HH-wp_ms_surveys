@@ -14,6 +14,11 @@ export default class Service extends AService<Model> {
         super(new Model());
     }
 
+    public async init(): Promise<void> {
+        await new Opinion().init();
+        await super.init();
+    }
+
     public async getById<Result = {}>(id: mongoose.Types.ObjectId, projection: { [p: string]: boolean }): Promise<Result> {
         const result = await super.getById<Result & { opinions?: CollectionObject[] }>(id, projection);
         if (!result) {

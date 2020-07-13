@@ -34,10 +34,26 @@ export default abstract class Tools {
         return returnValue;
     }
 
-    static getEnvironment(): Environment {
+    public static getEnvironment(): Environment {
+        if (process.env.NODE_ENV) {
+            const environment = <Environment | undefined>this.getEnumValues(Environment).find(value => {
+                return value === process.env.NODE_ENV;
+            });
+            if (environment) {
+                return environment;
+            }
+        }
         return typeof global.it === 'function' ? Environment.Test :
             Arguments.get('ENVIRONMENT').ENVIRONMENT == Environment.Production ? Environment.Production :
                 Environment.Development
-        ;
+            ;
+    }
+
+    public static getEnumValues(someEnum: any): string[] {
+        const names: string[] = [];
+        for (const key in someEnum) {
+            names.push(someEnum[key].toString && someEnum[key].toString() || someEnum[key]);
+        }
+        return names;
     }
 }

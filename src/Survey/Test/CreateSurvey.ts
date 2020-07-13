@@ -3,8 +3,12 @@ import AObject from "../../Core/AObject";
 import Service from "../Service";
 import {ErrorType} from "../../Core/Declarator/ErrorType";
 import Model from "../Model";
+import {Types} from "mongoose";
+
+type Survey = { _id?: Types.ObjectId, questions: { answers: ({ title: string })[]; title: string }[]; title: string };
 
 export class CreateSurvey extends AObject {
+    private _survey: Survey | undefined = undefined;
 
     constructor() {
         super();
@@ -24,6 +28,11 @@ export class CreateSurvey extends AObject {
     }
 
     private _run(): void {
+        it('should init Service', async function() {
+            this.timeout(5000);
+            await new Service().init();
+        });
+
         it('should not save with empty payload', async () => {
             try {
                 await new Service().create({});
@@ -238,6 +247,15 @@ export class CreateSurvey extends AObject {
             survey.questions[0].answers[0].should.have.property('title', payload.questions[0].answers[0].title);
             survey.questions[0].answers[1].should.be.an.Object();
             survey.questions[0].answers[1].should.have.property('title', payload.questions[0].answers[1].title);
+            this._survey = survey;
+        });
+
+        it('should get details', async () => {
+            const survey = await new Service().getById <Survey>(<Types.ObjectId>this._survey?._id, {});
+            survey.should.be.an.Object();
+            survey.should.have.property('_id');
+            survey._id?.toString().should.be.eql(this._survey?._id?.toString() || false);
+            survey.should.have.property('opinions', []);
         });
     }
 }

@@ -7,6 +7,8 @@ import {ControllerOutgoings} from "./Declarator/ControllerOutgoings";
 import {CollectionObject} from "./Declarator/CollectionObject";
 import RequestForeignService from "./Error/ConnectForeignService";
 import Tools from "./Helper/Tools";
+import {Environment} from "./Declarator/Environment";
+import App from "./App";
 
 type returnType = Promise<CollectionObject | CollectionObject[] | void>;
 
@@ -18,6 +20,7 @@ export default abstract class AForeignService extends AObject {
     public readonly abstract delete: { [key: string]: (...argument: any[]) => returnType };
     protected abstract readonly _path: string;
     private _needInit: boolean = true;
+    private _isConnected: boolean | undefined = undefined;
 
     public getPath(): string {
         return this._path;
@@ -56,6 +59,13 @@ export default abstract class AForeignService extends AObject {
     protected async _performRequest<T extends CollectionObject[] | CollectionObject>(method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH', params: ControllerOutgoings): Promise<T | undefined> {
         let response;
         const url = this._createUrl(params);
+        if (this._isConnected === false && App.ENVIRONMENT === Environment.Test) {
+            throw new InternalServerError({
+                field: 'Foreign_Service_' + this.constructor.name + '_CONNECTION',
+                type: ErrorType.invalid
+            });
+        }
+
         try {
             response = await fetch(url, {
                 method: method,
@@ -65,6 +75,12 @@ export default abstract class AForeignService extends AObject {
         } catch (err) {
             if (!(err instanceof AError)) {
                 this.logError('Foreign_' + this.constructor.name + '_Service not reachable');
+                if(App.ENVIRONMENT === Environment.Test) {
+                    throw new InternalServerError({
+                        field: 'Foreign_Service_' + this.constructor.name + '_Request',
+                        type: ErrorType.invalid
+                    });
+                }
                 return undefined;
             } else {
                 throw err;
@@ -78,8 +94,8 @@ export default abstract class AForeignService extends AObject {
             });
         }
         const json = await response.json();
-        if (!('success' in response) || !(<any>response).success) {
-            this.logError('unexpected response from Foreign_Service_' + this.constructor.name, response)
+        if (!('success' in json) || !json.success) {
+            this.logError('unexpected response from Foreign_Service_' + this.constructor.name, json);
             throw new InternalServerError({
                 field: 'Foreign_Service_' + this.constructor.name + '_RESPONSE',
                 type: ErrorType.invalid
@@ -105,20 +121,32 @@ export default abstract class AForeignService extends AObject {
         return url;
     }
 
-    private async _connect(): Promise<void> {
+    private async _connect(): Promise<boolean> {
         let returnValue;
         try {
             returnValue = await this._performGetRequest({params: ['health']});
+            this._isConnected = true;
         } catch (e) {
             if (e instanceof RequestForeignService) {
+                this._isConnected = false;
+                if(App.ENVIRONMENT === Environment.Test) {
+                    throw new InternalServerError({
+                        field: 'Foreign_Service_' + this.constructor.name + '_CONNECTION',
+                        type: ErrorType.invalid
+                    });
+                }
                 this.log('connection retry to: ', this.getPath());
                 await Tools.timeout(2000);
                 await this._connect();
-                return;
+                return false;
             } else {
                 throw e;
             }
         }
-        returnValue && this.log('Foreign Service connected: ' + this.constructor.name);
+        if (returnValue) {
+            this.log('Foreign Service connected: ' + this.constructor.name);
+            return true;
+        }
+        return false;
     }
 }
