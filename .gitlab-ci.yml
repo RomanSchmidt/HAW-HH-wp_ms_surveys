@@ -128,7 +128,7 @@ building_survey:
     # install python
     #- apt-get update
     #- apt-get upgrade -y
-    - apt-get install util-linux pciutils usbututils coreutils binutils findutils grep
+    #- apt-get install util-linux coreutils findutils grep
     - apt-get install python python-dev py-pip
     # install aws
     - pip install awscli
