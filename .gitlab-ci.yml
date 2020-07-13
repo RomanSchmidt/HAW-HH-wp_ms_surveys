@@ -61,7 +61,7 @@ testing_survey:
   dependencies:
     - build
   script:
-    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "development"
+    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support --reporter dot -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "development"
     - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_PM2 --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
     - pm2 kill
 
@@ -72,7 +72,7 @@ testing_opinion:
   dependencies:
     - build
   script:
-    - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "development"
+    - pm2 start dist/Survey/index.js --name "survey" --source-map-support --reporter dot -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "development"
     - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
