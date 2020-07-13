@@ -68,7 +68,7 @@ Um die Parameter zu überschreiben ist es einfacher direkt mocha auf zu rufen:
    - MONGO_URI: Das Default ist `mongodb://localhost:27017/wp-ms-surveys`.
    - FOREIGN_SERVICE_OPINION: Das Default ist `http://localhost:8081/opinion` 
    - PORT: Das Default ist `8080` 
-   - ENVIRONMENT: Das Default ist `developement`. `production` und `test` sind mögliche Eingaben. 
+   - ENVIRONMENT: Das Default ist `development`. `production` und `test` sind mögliche Eingaben. 
 ### Opinion
 - einzeln: `node -r source-map-support/register dist\Opinion\index.js --PORT=8081`
 - daemon: `pm2 start dist/Opinion/index.js --name "opinion " --source-map-support`
@@ -76,7 +76,7 @@ Um die Parameter zu überschreiben ist es einfacher direkt mocha auf zu rufen:
    - MONGO_URI: Das Default ist `mongodb://localhost:27017/wp-ms-surveys`.
    - FOREIGN_SERVICE_SURVEY: Das Default ist `http://localhost:8080/survey` 
    - PORT: Das Default ist `8081` 
-   - ENVIRONMENT: Das Default ist `developement`, `production` und `test` sind mögliche Eingaben. 
+   - ENVIRONMENT: Das Default ist `development`, `production` und `test` sind mögliche Eingaben. 
 ### Docker
 `docker-compose up -d`
    
