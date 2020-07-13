@@ -5,13 +5,15 @@ variables:
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
   #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
   MONGO_URI: mongodb://mongo:27017/wp-ms-surveys
-  FOREIGN_SERVICE_OPINION: http://localhost:8081/opinion
-  FOREIGN_SERVICE_SURVEY: http://localhost:8080/survey
-  PORT_SURVEY: 8080
-  PORT_OPINION: 8081
-  ENVIRONMENT: test
+  PORT_SURVEY_PM2: 8090
+  PORT_SURVEY_MOCHA: 8080
+  PORT_OPINION_PM2: 8081
+  PORT_OPINION_MOCHA: 8091
+  FOREIGN_SERVICE_OPINION: http://localhost:$PORT_SURVEY_PM2/opinion
+  FOREIGN_SERVICE_SURVEY: http://localhost:$PORT_OPINION_PM2/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
+  NODE_ENV: test
 
 image: node:$NODEJS_VERSION
 
@@ -56,8 +58,11 @@ testing_all:
   dependencies:
     - build
   script:
-    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION --PORT=$PORT_SURVEY --ENVIRONMENT=$ENVIRONMENT $DIST_PATH_SURVEY
-    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION --ENVIRONMENT=$ENVIRONMENT $DIST_PATH_OPINION
+    - pm2 start dist/Survey/index.js --name "survey" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "test"
+    - pm2 start dist/Opinion/index.js --name "opinion" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "test"
+    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
+    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
+    - pm2 kill all
 
 #build-and-push-container-stage:
 #  stage: build-and-push-container-stage
