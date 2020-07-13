@@ -4,7 +4,7 @@ variables:
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
   #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
-  MONGO_URI: mongodb://mongo:27017/wp-ms-surveys
+  MONGO_URI: mongodb://localhost:27017/wp-ms-surveys
   PORT_SURVEY_PM2: 8090
   PORT_SURVEY_MOCHA: 8080
   PORT_OPINION_PM2: 8091
