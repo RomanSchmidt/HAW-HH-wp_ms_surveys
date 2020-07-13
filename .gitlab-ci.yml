@@ -27,13 +27,15 @@ before_script:
   - npm install typescript -g --save
   - npm install ts-node -g --save
   - npm install pm2 -g --save
+  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
 
 #include:
 #  - template: AWS/Deploy-ECS.gitlab-ci.yml
 
 stages:
-  - build
+  - build_local
   - test
+  - build_and_push_docker
 
 services:
   - mongo:$MONGODB_VERSION
@@ -42,8 +44,8 @@ cache:
   paths:
     - node_modules/
 
-build:
-  stage: build
+build-local:
+  stage: build_local
   script:
     - npm run build
   artifacts:
@@ -76,20 +78,46 @@ testing_opinion:
     - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
-#build-and-push-container-stage:
-#  stage: build-and-push-container-stage
-#  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-#  before_script:
-#    - export SERVICE_NAME=survey
-#    - export SERVICE_NAME2=opinion
-#  script:
-#
+#building_mongo:
+#  stage: build_and_push_docker
 #  dependencies:
-#    - compile-and-test-stage
+#    - build_local
+#    - test
+#  script:
+#    - docker build -f src/Mongo/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
+#    - docker push $REPO:$CI_BUILD_REF_NAME
 
-#testing_testing:
-#  stage: test
+building_survey:
+  stage: build_and_push_docker
+  dependencies:
+    - build_local
+    - test
+  script:
+    # prebuild
+    - echo Logging in to Amazon ECR...
+    - aws --version
+    - $(aws ecr get-login --region us-east-1 --no-include-email)
+    - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp-ms-surveys-survey # uri of ECR
+    - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    # build
+    - docker build -f src/Survey/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
+    - docker push $REPO:$CI_BUILD_REF_NAME
+    #post build
+    - echo Build complete on `date`
+    - echo Pusching the Docker images...
+    - docker push $REPOSITORY_URI:latest # push to aws as latest tag
+    - docker push $REPOSITORY_URI:$IMAGE_TAG # push to aws as regular tag
+    - echo Writing image definitions file...
+    - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
+  artifacts:
+    paths:
+      - imagedefinitions.json
+
+#building_opinion:
+#  stage: build_and_push_docker
 #  dependencies:
-#    - npm
+#    - build_local
+#    - test
 #  script:
-#    - npm run testDot
+#    - docker build -f src/Survey/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
+#    - docker push $REPO:$CI_BUILD_REF_NAME
