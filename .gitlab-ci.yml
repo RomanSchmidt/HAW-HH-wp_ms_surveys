@@ -132,8 +132,9 @@ building_survey:
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   # build
   script:
-    - docker build -f src/Survey/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
-    - docker push $REPO:$CI_BUILD_REF_NAME
+    #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
+    - docker build -f src/Survey/Dockerfile --no-cache -t $REPOSITORY_URI:latest .
+    #- docker push $REPO:$CI_BUILD_REF_NAME
   #post build
   after_script:
     - echo Build complete on `date`
