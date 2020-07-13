@@ -39,6 +39,7 @@ stages:
 
 services:
   - mongo:$MONGODB_VERSION
+  - docker:dind
 
 cache:
   paths:
