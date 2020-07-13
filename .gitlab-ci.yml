@@ -49,7 +49,7 @@ before_script:
   - npm install pm2 -g --save
 
 build_local:
-  image: node:12.18.2-slim
+  #image: node:12.18.2-slim
   stage: build_local
   script:
     - npm run build
@@ -62,7 +62,7 @@ build_local:
       - dist/
 
 testing_survey:
-  image: node:12.18.2-slim
+  #image: node:12.18.2-slim
   stage: test
   services:
     - mongo:latest
@@ -74,7 +74,7 @@ testing_survey:
     - pm2 kill
 
 testing_opinion:
-  image: node:12.18.2-slim
+  #image: node:12.18.2-slim
   stage: test
   services:
     - mongo:latest
@@ -95,7 +95,7 @@ testing_opinion:
 #    - docker push $REPO:$CI_BUILD_REF_NAME
 
 building_survey:
-  image: gitlab/dind
+  #image: gitlab/dind
   services:
     - docker:dind
   stage: build_and_push_docker
