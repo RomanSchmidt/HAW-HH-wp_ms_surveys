@@ -39,7 +39,6 @@ stages:
 
 services:
   - mongo:$MONGODB_VERSION
-  - docker:dind
 
 cache:
   paths:
@@ -89,6 +88,8 @@ testing_opinion:
 #    - docker push $REPO:$CI_BUILD_REF_NAME
 
 building_survey:
+  services:
+    - docker:dind
   stage: build_and_push_docker
   dependencies:
     - build_local
