@@ -127,7 +127,7 @@ building_survey:
     - build_local
     - testing_survey
   # prebuild
-  script:
+  before_script:
     # python install
     - apk update
     - apk upgrade
@@ -135,6 +135,10 @@ building_survey:
     - apk add --no-cache curl jq python3 py3-pip
     # AWS install
     - pip install --upgrade awscli
+    #- echo REPOSITORY_URI -> $REPOSITORY_URI
+    #- echo IMAGE_TAG -> $IMAGE_TAG
+  # build
+  script:
     # use AWS
     - echo Logging in to Amazon ECR...
     #- aws configure list
@@ -143,16 +147,14 @@ building_survey:
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    #- echo REPOSITORY_URI -> $REPOSITORY_URI
-    #- echo IMAGE_TAG -> $IMAGE_TAG
-    # build
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile .
     - echo tag
     - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
     #- docker push $REPO:$CI_BUILD_REF_NAME
-    #post build
+  #post build
+  #after_script:
     - echo Build complete on `date`
     - echo Pusching the Docker images...
     - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
