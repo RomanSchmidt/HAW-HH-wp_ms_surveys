@@ -120,9 +120,9 @@ building_survey:
   tags:
     - dind
     - docker
-  image: docker:19.03.5
+  image: docker:19.03.11
   services:
-    - docker:19.03.5-dind
+    - docker:19.03.11-dind
   dependencies:
     - build_local
     - testing_survey
@@ -143,8 +143,8 @@ building_survey:
     - echo Logging in to Amazon ECR...
     #- aws configure list
     - aws --version
-    - apk --no-cache add tzdata openntpd
-    - $(aws ecr get-login --region us-east-1 --no-include-email)
+    #- apk --no-cache add tzdata openntpd
+    #- $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
     - echo build
