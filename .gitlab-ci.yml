@@ -2,6 +2,7 @@ image: docker:git
 
 variables:
   #DOCKER_DRIVER: overlay
+  DOCKER_DRIVER: vfs
   MONGODB_VERSION: "4.2"
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
