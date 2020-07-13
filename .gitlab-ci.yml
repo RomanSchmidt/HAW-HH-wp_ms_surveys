@@ -125,6 +125,11 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
+    # install python
+    - apk update
+    - apk upgrade
+    - apk add util-linux pciutils usbututils coreutils binutils findutils grep
+    - apk add python python-dev py-pip
     # install aws
     - pip install awscli
     - echo Logging in to Amazon ECR...
