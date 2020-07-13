@@ -102,7 +102,9 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
-    - PATH=/usr/local/bin:$PATH
+    - echo $PATH
+    - PATH=$PATH:/usr/local/bin
+    - echo $PATH
     - hash -r
     - echo Logging in to Amazon ECR...
     - aws --version
