@@ -74,7 +74,7 @@ export default abstract class AForeignService extends AObject {
             });
         } catch (err) {
             if (!(err instanceof AError)) {
-                this.logError('Foreign_' + this.constructor.name + '_Service not reachable');
+                this.logError('Foreign_' + this.constructor.name + '_Service not reachable', url);
                 if(App.ENVIRONMENT === Environment.Test) {
                     throw new InternalServerError({
                         field: 'Foreign_Service_' + this.constructor.name + '_Request',
