@@ -1,5 +1,3 @@
-image: docker:19.03.5
-
 variables:
   #DOCKER_DRIVER: overlay
   DOCKER_DRIVER: vfs
@@ -37,19 +35,25 @@ cache:
     - node_modules/
 
 #This command is run before all the jobs
-before_script:
-  - docker info
-  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
-  - npm install
-  - npm install mocha -g --save
-  - npm install source-map-support -g --save
-  - npm install typescript -g --save
-  - npm install ts-node -g --save
-  - npm install pm2 -g --save
+#before_script:
+#  - docker info
+#  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
+#  - npm install
+#  - npm install mocha -g --save
+#  - npm install source-map-support -g --save
+#  - npm install typescript -g --save
+#  - npm install ts-node -g --save
+#  - npm install pm2 -g --save
 
 build_local:
-  #image: node:12.18.2-slim
+  image: docker:19.03.5
   stage: build_local
+  before_script:
+    - npm install
+    - npm install source-map-support -g --save
+    - npm install typescript -g --save
+    - npm install typescript -g --save
+    - npm install ts-node -g --save
   script:
     - npm run build
   artifacts:
@@ -61,24 +65,38 @@ build_local:
       - dist/
 
 testing_survey:
-  #image: node:12.18.2-slim
+  image: node:12.18.2-slim
   stage: test
   services:
     - mongo:latest
   dependencies:
     - build_local
+  before_script:
+    - npm install
+    - npm install source-map-support -g --save
+    - npm install typescript -g --save
+    - npm install typescript -g --save
+    - npm install ts-node -g --save
+    - npm install pm2 -g --save
   script:
     - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support --reporter dot -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "development"
     - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_PM2 --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
     - pm2 kill
 
 testing_opinion:
-  #image: node:12.18.2-slim
+  image: node:12.18.2-slim
   stage: test
   services:
     - mongo:latest
   dependencies:
     - build_local
+  before_script:
+    - npm install
+    - npm install source-map-support -g --save
+    - npm install typescript -g --save
+    - npm install typescript -g --save
+    - npm install ts-node -g --save
+    - npm install pm2 -g --save
   script:
     - pm2 start dist/Survey/index.js --name "survey" --source-map-support --reporter dot -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "development"
     - mocha --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
@@ -95,6 +113,7 @@ testing_opinion:
 
 building_survey:
   #image: gitlab/dind
+  image: docker:19.03.5
   services:
     - docker:dind
   stage: build_and_push_docker
@@ -103,6 +122,7 @@ building_survey:
     - testing_survey
   # prebuild
   before_script:
+    - docker info
     - echo Logging in to Amazon ECR...
     - aws --version
     - $(aws ecr get-login --region us-east-1 --no-include-email)
