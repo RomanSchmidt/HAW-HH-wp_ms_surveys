@@ -132,6 +132,8 @@ building_survey:
     - apk add --no-cache curl jq python3 py3-pip
     # AWS install
     - pip install --upgrade awscli
+    - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
+    - docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
   # build
   script:
     # use AWS
@@ -142,8 +144,6 @@ building_survey:
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
-    - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
-    - docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
