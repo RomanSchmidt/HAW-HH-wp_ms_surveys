@@ -130,8 +130,7 @@ building_survey:
     #- apt-get upgrade -y
     #- apt-get install util-linux coreutils findutils grep
     - apt-get install python
-    - add-apt-repository universe
-    - apt-get install python-pip
+    - apt-get install -y python3-pip
     # install aws
     - pip install awscli
     - echo Logging in to Amazon ECR...
