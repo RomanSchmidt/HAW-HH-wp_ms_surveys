@@ -1,7 +1,7 @@
 image: docker:git
 
 variables:
-  DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: overlay
   MONGODB_VERSION: "4.2"
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
@@ -37,7 +37,6 @@ cache:
 
 #This command is run before all the jobs
 before_script:
-  - printenv
   - docker info
   - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
   - npm install
