@@ -19,16 +19,6 @@ variables:
 
 image: docker:latest
 
-#This command is run before all the jobs
-before_script:
-  - npm install
-  - npm install mocha -g --save
-  - npm install source-map-support -g --save
-  - npm install typescript -g --save
-  - npm install ts-node -g --save
-  - npm install pm2 -g --save
-  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
-
 #include:
 #  - template: AWS/Deploy-ECS.gitlab-ci.yml
 
@@ -44,6 +34,16 @@ services:
 cache:
   paths:
     - node_modules/
+
+#This command is run before all the jobs
+before_script:
+  - npm install
+  - npm install mocha -g --save
+  - npm install source-map-support -g --save
+  - npm install typescript -g --save
+  - npm install ts-node -g --save
+  - npm install pm2 -g --save
+  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
 
 build_local:
   image: node:$NODEJS_VERSION
