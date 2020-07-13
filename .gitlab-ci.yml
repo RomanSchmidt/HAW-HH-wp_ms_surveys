@@ -126,11 +126,11 @@ building_survey:
   # prebuild
   before_script:
     # install python
-    - apt-get update
+    - apk update
     #- apt-get upgrade -y
     #- apt-get install util-linux coreutils findutils grep
-    - apt-get install python
-    - apt-get install -y python3-pip
+    - apk install python
+    - apk install -y python3-pip
     # install aws
     - pip install awscli
     - echo Logging in to Amazon ECR...
