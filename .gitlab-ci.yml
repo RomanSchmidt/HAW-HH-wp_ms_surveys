@@ -36,7 +36,7 @@ cache:
 
 build:
   stage: build
-  image: node:latest-slim
+  image: node:12.18.2-slim
   script:
     - npm run build
   artifacts:
