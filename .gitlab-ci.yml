@@ -141,7 +141,7 @@ building_survey:
     - aws --version
     - apk --no-cache add tzdata openntpd
     - $(aws ecr get-login --region us-east-1 --no-include-email)
-    - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp-ms-surveys-survey # uri of ECR
+    - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
     #- echo REPOSITORY_URI -> $REPOSITORY_URI
     #- echo IMAGE_TAG -> $IMAGE_TAG
