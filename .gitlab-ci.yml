@@ -1,4 +1,7 @@
+image: gitlab/dind
+
 variables:
+  DOCKER_DRIVER: overlay
   MONGODB_VERSION: "4.2"
   NODEJS_VERSION: "12.18.2-slim"
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
@@ -16,8 +19,6 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
-
-image: docker:latest
 
 #include:
 #  - template: AWS/Deploy-ECS.gitlab-ci.yml
@@ -92,24 +93,26 @@ testing_opinion:
 #    - docker push $REPO:$CI_BUILD_REF_NAME
 
 building_survey:
-  image: docker:latest
+  image: gitlab/dind
   services:
     - docker:dind
   stage: build_and_push_docker
   dependencies:
     - build_local
     - testing_survey
-  script:
-    # prebuild
+  # prebuild
+  before_script:
     - echo Logging in to Amazon ECR...
     - aws --version
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=697657657359.dkr.ecr.us-east-1.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    # build
+  # build
+  script:
     - docker build -f src/Survey/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
     - docker push $REPO:$CI_BUILD_REF_NAME
-    #post build
+  #post build
+  after_script:
     - echo Build complete on `date`
     - echo Pusching the Docker images...
     - docker push $REPOSITORY_URI:latest # push to aws as latest tag
