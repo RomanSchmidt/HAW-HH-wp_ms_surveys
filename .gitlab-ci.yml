@@ -1,5 +1,6 @@
 variables:
   MONGODB_VERSION: "4.2"
+  NODEJS_VERSION: "12.18.2-slim"
   #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
   #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
   #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
@@ -11,6 +12,8 @@ variables:
   ENVIRONMENT: test
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
+
+image: NODEJS_VERSION
 
 #This command is run before all the jobs
 before_script:
@@ -36,7 +39,6 @@ cache:
 
 build:
   stage: build
-  image: node:12.18.2-slim
   script:
     - npm run build
   artifacts:
