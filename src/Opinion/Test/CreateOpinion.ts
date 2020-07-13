@@ -52,13 +52,19 @@ export class CreateOpinion extends AObject {
                 await new Service().create({
                     surveyId: this._survey._id
                 });
-            } catch (e) {
-                should(e).be.an.Object();
-                should(e).have.property('message').which.is.an.String();
-                const message = JSON.parse(e.message);
-                message.should.be.an.Object();
-                message.should.be.eql({response: ErrorType.empty});
-                return;
+            } catch (error) {
+                should(error).be.an.Object();
+                should(error).have.property('message').which.is.an.String();
+                try {
+                    const message = JSON.parse(error.message);
+                    message.should.be.an.Object();
+                    message.should.be.eql({response: ErrorType.empty});
+                    return;
+                } catch (e) {
+                    this.logError('wrong message type', error);
+                    should(true).be.false();
+                    return;
+                }
             }
             false.should.be.true('no exception');
         });
