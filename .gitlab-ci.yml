@@ -17,7 +17,7 @@ variables:
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
 
-image: node:$NODEJS_VERSION
+image: docker:latest
 
 #This command is run before all the jobs
 before_script:
@@ -45,6 +45,7 @@ cache:
     - node_modules/
 
 build_local:
+  image: node:$NODEJS_VERSION
   stage: build_local
   script:
     - npm run build
@@ -57,6 +58,7 @@ build_local:
       - dist/
 
 testing_survey:
+  image: node:$NODEJS_VERSION
   stage: test
   services:
     - mongo:latest
@@ -68,6 +70,7 @@ testing_survey:
     - pm2 kill
 
 testing_opinion:
+  image: node:$NODEJS_VERSION
   stage: test
   services:
     - mongo:latest
@@ -88,6 +91,7 @@ testing_opinion:
 #    - docker push $REPO:$CI_BUILD_REF_NAME
 
 building_survey:
+  image: docker:latest
   services:
     - docker:dind
   stage: build_and_push_docker
