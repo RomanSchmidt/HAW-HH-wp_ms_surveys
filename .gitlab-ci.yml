@@ -142,7 +142,7 @@ building_survey:
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
-    - echo "login = $REPOSITORY_URI -> $CI_BUILD_REF -> $IMAGE_TAG"
+    - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
     - docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
