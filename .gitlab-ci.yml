@@ -24,6 +24,7 @@ before_script:
   - npm install source-map-support -g --save
   - npm install typescript -g --save
   - npm install ts-node -g --save
+  - npm install pm2 -g --save
 
 #include:
 #  - template: AWS/Deploy-ECS.gitlab-ci.yml
@@ -51,7 +52,17 @@ build:
       - src/
       - dist/
 
-testing_all:
+testing_survey:
+  stage: test
+  services:
+    - mongo:latest
+  dependencies:
+    - build
+  script:
+    - pm2 start dist/Opinion/index.js --name "opinion" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "test"
+    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
+
+testing_opinion:
   stage: test
   services:
     - mongo:latest
@@ -59,10 +70,8 @@ testing_all:
     - build
   script:
     - pm2 start dist/Survey/index.js --name "survey" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "test"
-    - pm2 start dist/Opinion/index.js --name "opinion" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "test"
     - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
-    - mocha --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
-    - pm2 kill all
+
 
 #build-and-push-container-stage:
 #  stage: build-and-push-container-stage
