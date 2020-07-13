@@ -132,8 +132,6 @@ building_survey:
     - apk add --no-cache curl jq python3 py3-pip
     # AWS install
     - pip install --upgrade awscli
-    #- echo REPOSITORY_URI -> $REPOSITORY_URI
-    #- echo IMAGE_TAG -> $IMAGE_TAG
   # build
   script:
     # use AWS
@@ -143,24 +141,24 @@ building_survey:
     #- apk --no-cache add tzdata openntpd
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
-    - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    #- IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
     #- echo login
     #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
     - echo build
-    #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
+    #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$CI_BUILD_REF_NAME" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile .
-    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
-    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
+    - echo "tag -> $REPOSITORY_URI:$CI_BUILD_REF_NAME"
+    - docker tag $REPOSITORY_URI $REPOSITORY_URI:CI_BUILD_REF_NAME # add another tag for aws to refer to a source image
     #- docker push $REPO:$CI_BUILD_REF_NAME
   #post build
   #after_script:
     - echo Build complete on `date`
     - echo Pusching the Docker images...
-    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    - echo "uri:tag -> $REPOSITORY_URI:$CI_BUILD_REF_NAME"
+    - docker push $REPOSITORY_URI:$CI_BUILD_REF_NAME
     - docker push $REPOSITORY_URI:latest
     - echo Writing image definitions file...
-    - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
+    - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$CI_BUILD_REF_NAME > imagedefinitions.json # create a file which helps the aws service to find the image
   artifacts:
     paths:
       - imagedefinitions.json
