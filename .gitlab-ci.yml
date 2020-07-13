@@ -17,6 +17,7 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
+  DOCKER_HOST: tcp://localhost:2375
 
 #include:
 #  - template: AWS/Deploy-ECS.gitlab-ci.yml
