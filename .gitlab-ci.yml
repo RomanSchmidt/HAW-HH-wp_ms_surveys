@@ -118,7 +118,7 @@ building_survey:
   image: gitlab/dind
   #image: docker
   services:
-    - docker:dind
+    - docker:gitlab/dind
   stage: build_and_push_docker
   dependencies:
     - build_local
