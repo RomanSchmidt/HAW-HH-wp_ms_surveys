@@ -78,6 +78,13 @@ export default abstract class AForeignService extends AObject {
             });
         }
         const json = await response.json();
+        if (!('success' in response) || !(<any>response).success) {
+            this.logError('unexpected response from Foreign_Service_' + this.constructor.name, response)
+            throw new InternalServerError({
+                field: 'Foreign_Service_' + this.constructor.name + '_RESPONSE',
+                type: ErrorType.invalid
+            });
+        }
         return <any>json.success;
     }
 
