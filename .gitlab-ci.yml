@@ -127,10 +127,9 @@ building_survey:
   before_script:
     # install python
     - apk update
-    #- apt-get upgrade -y
+    - apk upgrade
+    - apk add util-linux pcutils usbutils coreutils binutils findutils grep
     #- apt-get install util-linux coreutils findutils grep
-    - apk install python
-    - apk install -y python3-pip
     # install aws
     - pip install awscli
     - echo Logging in to Amazon ECR...
