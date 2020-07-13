@@ -136,7 +136,7 @@ building_survey:
     - echo Logging in to Amazon ECR...
     #- aws configure list
     - aws --version
-    - apt-get install -y ntp
+    - apk add ntp
     - ntpd -gq
     - service ntp start
     - $(aws ecr get-login --region us-east-1 --no-include-email)
