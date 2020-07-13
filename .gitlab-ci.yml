@@ -53,7 +53,6 @@ build_local:
     - npm install
     - npm install source-map-support -g --save
     - npm install typescript -g --save
-    - npm install typescript -g --save
     - npm install ts-node -g --save
   script:
     - npm run build
@@ -76,7 +75,6 @@ testing_survey:
     - npm install -D
     - npm install source-map-support -g --save
     - npm install typescript -g --save
-    - npm install typescript -g --save
     - npm install ts-node -g --save
     - npm install pm2 -g --save
     - npm install mocha -g --save
@@ -95,7 +93,6 @@ testing_opinion:
   before_script:
     - npm install -D
     - npm install source-map-support -g --save
-    - npm install typescript -g --save
     - npm install typescript -g --save
     - npm install ts-node -g --save
     - npm install pm2 -g --save
@@ -147,10 +144,12 @@ building_survey:
     #- $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    #- echo login
+    #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
     - echo build
     #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile .
-    - echo tag
+    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
     - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
     #- docker push $REPO:$CI_BUILD_REF_NAME
   #post build
