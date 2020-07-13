@@ -130,7 +130,7 @@ building_survey:
     - apk upgrade
     - apk add util-linux pciutils usbutils coreutils binutils findutils grep
     - apk add --no-cache curl jq python3 py3-pip
-    - apk add python python-dev py-pip
+    #- apk add python python-dev py-pip
     # install aws
     - pip install awscli
     - echo Logging in to Amazon ECR...
