@@ -13,7 +13,7 @@ variables:
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
 
-image: NODEJS_VERSION
+image: $NODEJS_VERSION
 
 #This command is run before all the jobs
 before_script:
