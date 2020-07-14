@@ -17,9 +17,6 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
-  DOCKER_REPOSITORY: $DOCKER_REPOSITORY
-  REGISTRY_USER: $REGISTRY_USER
-  REGISTRY_USER_PASSWORD: $REGISTRY_USER_PASSWORD
   #DOCKER_HOST: tcp://localhost:2375
 
 #include:
@@ -138,7 +135,8 @@ building_survey:
     # AWS install
     - pip install --upgrade awscli
     - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
-    - docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
+    #- docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
+    - docker login -u AWS --password-stdin $AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   # build
   script:
     # use AWS
