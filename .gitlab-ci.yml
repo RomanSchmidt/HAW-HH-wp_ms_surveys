@@ -1,10 +1,6 @@
 variables:
   DOCKER_DRIVER: overlay2
-  #DOCKER_DRIVER: vfs
   MONGODB_VERSION: "4.2"
-  #CI_AWS_ECS_CLUSTER: wp-ms-surveys-cluster
-  #CI_AWS_ECS_SERVICE: wp-ms-surveys-survey-service
-  #CI_AWS_ECS_TASK_DEFINITION: wp-ms-surveys-survey-task
   MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys_test
   MONGO_URI_MOCHA: mongodb://localhost:27017/wp-ms-surveys
   PORT_SURVEY_PM2: 8090
@@ -17,10 +13,6 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
-  #DOCKER_HOST: tcp://localhost:2375
-
-#include:
-#  - template: AWS/Deploy-ECS.gitlab-ci.yml
 
 stages:
   - build_local
@@ -34,19 +26,6 @@ services:
 cache:
   paths:
     - node_modules/
-
-  #This command is run before all the jobs
-  #before_script:
-  #- echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
-  #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
-#  - docker info
-#  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
-#  - npm install
-#  - npm install mocha -g --save
-#  - npm install source-map-support -g --save
-#  - npm install typescript -g --save
-#  - npm install ts-node -g --save
-#  - npm install pm2 -g --save
 
 build_local:
   image: node:12.18.2-slim
@@ -104,17 +83,7 @@ testing_opinion:
     - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
-#building_mongo:
-#  stage: build_and_push_docker
-#  dependencies:
-#    - build_local
-#    - test
-#  script:
-#    - docker build -f src/Mongo/Dockerfile --no-cache -t "$REPO:$CI_BUILD_REF_NAME" .
-#    - docker push $REPO:$CI_BUILD_REF_NAME
-
 building_survey:
-  #image: gitlab/dind
   stage: build_and_push_docker
   tags:
     - dind
@@ -125,7 +94,6 @@ building_survey:
   dependencies:
     - build_local
     - testing_survey
-  # prebuild
   before_script:
     # python install
     - apk update
@@ -134,45 +102,121 @@ building_survey:
     - apk add --no-cache curl jq python3 py3-pip
     # AWS install
     - pip install --upgrade awscli
-  # build
   script:
     # use AWS
     - echo Logging in to Amazon ECR...
-    #- aws configure list
     - aws --version
-    #- apk --no-cache add tzdata openntpd
     - $(aws ecr get-login --region us-east-1 --no-include-email)
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
-    - echo "login = $AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
-    #- docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
-    #- docker login -u AWS --password-stdin "$AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+    # login to docker
     - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
-    #- docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY amazon/aws-cli ecr get-login-password --region $AWS_DEFAULT_REGION | docker login -u AWS --password-stdin "$AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+    # build
     - echo build
-    #- docker build -f src/Survey/Dockerfile --no-cache -t "$REPOSITORY_URI:$IMAGE_TAG" .
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
     - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
     - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
-    #- docker push $REPO:$IMAGE_TAG
-    #post build
-    #after_script:
+    # push
     - echo Build complete on `date`
     - echo Pusching the Docker images...
     - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
     - docker push $REPOSITORY_URI:latest
     - docker push $REPOSITORY_URI:$IMAGE_TAG
+    # write definitions file
     - echo Writing image definitions file...
     - printf '[{"name":"wp-ms-surveys-survey-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
   artifacts:
     paths:
       - imagedefinitions.json
 
-#building_opinion:
-#  stage: build_and_push_docker
-#  dependencies:
-#    - build_local
-#    - testing_opinion
-#  script:
-#    - docker build -f src/Survey/Dockerfile --no-cache -t "$REPO:$IMAGE_TAG" .
-#    - docker push $REPO:$IMAGE_TAG
+building_opinion:
+  stage: build_and_push_docker
+  tags:
+    - dind
+    - docker
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  dependencies:
+    - build_local
+    - testing_opinion
+  before_script:
+    # python install
+    - apk update
+    - apk upgrade
+    - apk add util-linux pciutils usbutils coreutils binutils findutils grep
+    - apk add --no-cache curl jq python3 py3-pip
+    # AWS install
+    - pip install --upgrade awscli
+  script:
+    # use AWS
+    - echo Logging in to Amazon ECR...
+    - aws --version
+    - $(aws ecr get-login --region us-east-1 --no-include-email)
+    - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-opinion # uri of ECR
+    - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
+    # login to docker
+    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    # build
+    - echo build
+    - docker build -t $REPOSITORY_URI:latest -f ./src/Opinion/Dockerfile .
+    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
+    # push
+    - echo Build complete on `date`
+    - echo Pusching the Docker images...
+    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker push $REPOSITORY_URI:latest
+    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    # write definitions file
+    - echo Writing image definitions file...
+    - printf '[{"name":"wp-ms-surveys-opinion-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
+  artifacts:
+    paths:
+      - imagedefinitions.json
+
+building_mongo:
+  stage: build_and_push_docker
+  tags:
+    - dind
+    - docker
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  dependencies:
+    - build_local
+    - testing_mongo
+  before_script:
+    # python install
+    - apk update
+    - apk upgrade
+    - apk add util-linux pciutils usbutils coreutils binutils findutils grep
+    - apk add --no-cache curl jq python3 py3-pip
+    # AWS install
+    - pip install --upgrade awscli
+  script:
+    # use AWS
+    - echo Logging in to Amazon ECR...
+    - aws --version
+    - $(aws ecr get-login --region us-east-1 --no-include-email)
+    - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-mongo # uri of ECR
+    - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
+    # login to docker
+    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    # build
+    - echo build
+    - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile .
+    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
+    # push
+    - echo Build complete on `date`
+    - echo Pusching the Docker images...
+    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker push $REPOSITORY_URI:latest
+    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    # write definitions file
+    - echo Writing image definitions file...
+    - printf '[{"name":"wp-ms-surveys-mongo-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
+  artifacts:
+    paths:
+      - imagedefinitions.json
