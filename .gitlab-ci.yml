@@ -17,6 +17,9 @@ variables:
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
+  DOCKER_REPOSITORY: DOCKER_REPOSITORY
+  REGISTRY_USER: REGISTRY_USER
+  REGISTRY_USER_PASSWORD: REGISTRY_USER_PASSWORD
   #DOCKER_HOST: tcp://localhost:2375
 
 #include:
@@ -35,10 +38,10 @@ cache:
   paths:
     - node_modules/
 
-#This command is run before all the jobs
-before_script:
-  - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
-  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
+  #This command is run before all the jobs
+  #before_script:
+  #- echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
+  #- docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
 #  - docker info
 #  - docker login $DOCKER_REPOSITORY -u $REGISTRY_USER -p $REGISTRY_USER_PASSWORD
 #  - npm install
@@ -134,8 +137,8 @@ building_survey:
     - apk add --no-cache curl jq python3 py3-pip
     # AWS install
     - pip install --upgrade awscli
-    #- echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
-    #- docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
+    - echo "login = $DOCKER_REPOSITORY -u $REGISTRY_USER"
+    - docker login "$DOCKER_REPOSITORY" -u "$REGISTRY_USER" -p "$REGISTRY_USER_PASSWORD"
   # build
   script:
     # use AWS
@@ -152,8 +155,8 @@ building_survey:
     - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
     - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
     #- docker push $REPO:$IMAGE_TAG
-  #post build
-  #after_script:
+    #post build
+    #after_script:
     - echo Build complete on `date`
     - echo Pusching the Docker images...
     - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
