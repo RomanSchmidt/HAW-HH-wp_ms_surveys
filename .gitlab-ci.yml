@@ -219,3 +219,4 @@ building_mongo:
   artifacts:
     paths:
       - imagedefinitions.json
+      - docker-healthcheck
