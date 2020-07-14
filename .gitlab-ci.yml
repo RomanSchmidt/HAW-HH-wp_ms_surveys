@@ -185,7 +185,6 @@ building_mongo:
     - docker:19.03.12-dind
   dependencies:
     - build_local
-    - testing_mongo
   before_script:
     # python install
     - apk update
