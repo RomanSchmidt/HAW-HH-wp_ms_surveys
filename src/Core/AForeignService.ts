@@ -90,13 +90,6 @@ export default abstract class AForeignService extends AObject {
                 throw err;
             }
         }
-        if (response.status >= 500) {
-            this.logError('serverResult', {url, method, status: response.status, headers: response.headers});
-            throw new RequestForeignService({
-                field: 'Foreign_Service_' + this.constructor.name + '_Response',
-                type: ErrorType.invalid
-            });
-        }
         if (response.status >= 400) {
             this.logError('serverResult', {url, method, status: response.status, headers: response.headers});
             throw new InternalServerError({
