@@ -83,7 +83,7 @@ testing_opinion:
     - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
-building_survey:
+building_and_pushing_survey:
   stage: build_and_push_docker
   tags:
     - dind
@@ -129,7 +129,7 @@ building_survey:
     paths:
       - imagedefinitions.json
 
-building_opinion:
+building_and_pushing_opinion:
   stage: build_and_push_docker
   tags:
     - dind
@@ -175,7 +175,7 @@ building_opinion:
     paths:
       - imagedefinitions.json
 
-building_mongo:
+building_and_pushing_mongo:
   stage: build_and_push_docker
   tags:
     - dind

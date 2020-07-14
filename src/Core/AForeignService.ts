@@ -33,7 +33,11 @@ export default abstract class AForeignService extends AObject {
 
         this._needInit = false;
         await super.init();
-        await this._connect();
+        try {
+            await this._connect();
+        } catch (e) {
+
+        }
     }
 
     protected async _performGetRequest<T extends CollectionObject[] | CollectionObject>(param: ControllerOutgoings): Promise<CollectionObject | CollectionObject[] | undefined> {
