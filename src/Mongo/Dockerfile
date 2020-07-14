@@ -16,6 +16,6 @@ FROM mongo
 #EXPOSE $PORT_
 
 #CMD mongod --bind_ip_all --port $PORT_
-COPY docker-healthcheck /usr/local/bin/
+COPY src/Mongo/docker-healthcheck /usr/local/bin/
 
 HEALTHCHECK CMD ["docker-healthcheck"]
