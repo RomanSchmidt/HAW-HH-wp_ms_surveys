@@ -16,14 +16,6 @@ stages:
   - test
   - build_and_push_docker
 
-#services:
-  #- mongo:$MONGODB_VERSION
-  #- docker:$DOCKER_VERSION-dind
-
-cache:
-  paths:
-    - node_modules/
-
 build_local:
   image: node:$NODE_VERSION
   stage: build_local
