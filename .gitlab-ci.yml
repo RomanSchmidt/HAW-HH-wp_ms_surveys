@@ -1,15 +1,15 @@
 variables:
   DOCKER_DRIVER: overlay2
   MONGODB_VERSION: "4.2"
-  MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys_test
+  #MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys_test
   MONGO_URI_MOCHA: mongodb://localhost:27017/wp-ms-surveys
-  PORT_SURVEY_PM2: 8090
+  #PORT_SURVEY_PM2: 8090
   PORT_SURVEY_MOCHA: 8080
-  PORT_OPINION_PM2: 8091
+  #PORT_OPINION_PM2: 8091
   PORT_OPINION_MOCHA: 8081
-  FOREIGN_SERVICE_OPINION_PM2: http://localhost:$PORT_OPINION_PM2/opinion
+  #FOREIGN_SERVICE_OPINION_PM2: http://localhost:$PORT_OPINION_PM2/opinion
   FOREIGN_SERVICE_OPINION_MOCHA: http://localhost:$PORT_OPINION_MOCHA/opinion
-  FOREIGN_SERVICE_SURVEY_PM2: http://localhost:$PORT_SURVEY_PM2/survey
+  #FOREIGN_SERVICE_SURVEY_PM2: http://localhost:$PORT_SURVEY_PM2/survey
   FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
@@ -48,6 +48,8 @@ build_local:
 testing_survey:
   image: node:12.18.2-slim
   stage: test
+  variables:
+    NODE_ENV: test
   services:
     - mongo:latest
   dependencies:
@@ -60,8 +62,8 @@ testing_survey:
     - npm install pm2 -g --save
     - npm install mocha -g --save
   script:
-    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI_MOCHA" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_PM2" --ENVIRONMENT "test"
-    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_PM2 --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
+    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI_MOCHA" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_MOCHA" --ENVIRONMENT "test"
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_MOCHA --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
     - pm2 kill
 
 testing_opinion:
@@ -79,8 +81,8 @@ testing_opinion:
     - npm install pm2 -g --save
     - npm install mocha -g --save
   script:
-    - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI_PM2" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_PM2" --ENVIRONMENT "development"
-    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_PM2 --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
+    - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI_MOCHA" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_MOCHA" --ENVIRONMENT "development"
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_MOCHA --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
 
 building_and_pushing_survey:
