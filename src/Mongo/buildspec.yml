@@ -17,7 +17,7 @@ phases:
       - echo Build started on ´date´
       - echo Building the Docker image...
       - docker pull mongo # get the mongo repo for docker
-      - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile ./src/Mongo # build with with Dockerfile in Survey and set the latest tag
+      - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
       - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
   post_build:
     commands:
@@ -30,4 +30,3 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json # add the created file to the docker image
-    - src/Mongo/docker-healthcheck
