@@ -1,16 +1,11 @@
 variables:
   DOCKER_DRIVER: overlay2
   MONGODB_VERSION: "4.2"
-  #MONGO_URI_PM2: mongodb://localhost:27017/wp-ms-surveys_test
-  MONGO_URI_MOCHA: mongodb://localhost:27017/wp-ms-surveys
-  #PORT_SURVEY_PM2: 8090
-  PORT_SURVEY_MOCHA: 8080
-  #PORT_OPINION_PM2: 8091
-  PORT_OPINION_MOCHA: 8081
-  #FOREIGN_SERVICE_OPINION_PM2: http://localhost:$PORT_OPINION_PM2/opinion
-  FOREIGN_SERVICE_OPINION_MOCHA: http://localhost:$PORT_OPINION_MOCHA/opinion
-  #FOREIGN_SERVICE_SURVEY_PM2: http://localhost:$PORT_SURVEY_PM2/survey
-  FOREIGN_SERVICE_SURVEY_MOCHA: http://localhost:$PORT_SURVEY_MOCHA/survey
+  MONGO_URI: mongodb://localhost:27017/wp-ms-surveys
+  PORT_SURVEY: 8080
+  PORT_OPINION: 8081
+  FOREIGN_SERVICE_OPINION: http://localhost:$PORT_OPINION/opinion
+  FOREIGN_SERVICE_SURVEY: http://localhost:$PORT_SURVEY/survey
   DIST_PATH_SURVEY: dist/Survey/Test
   DIST_PATH_OPINION: dist/Opinion/Test
 
@@ -62,8 +57,8 @@ testing_survey:
     - npm install pm2 -g --save
     - npm install mocha -g --save
   script:
-    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI_MOCHA" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY_MOCHA" --PORT "$PORT_OPINION_MOCHA" --ENVIRONMENT "test"
-    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION_MOCHA --PORT=$PORT_SURVEY_MOCHA --ENVIRONMENT=test $DIST_PATH_SURVEY
+    - pm2 start dist/Opinion/index.js --name "opinion" --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY" --PORT "$PORT_OPINION" --ENVIRONMENT "test"
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_OPINION=$FOREIGN_SERVICE_OPINION --PORT=$PORT_SURVEY --ENVIRONMENT=test $DIST_PATH_SURVEY
     - pm2 kill
 
 testing_opinion:
@@ -81,9 +76,55 @@ testing_opinion:
     - npm install pm2 -g --save
     - npm install mocha -g --save
   script:
-    - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI_MOCHA" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION_MOCHA" --PORT "$PORT_SURVEY_MOCHA" --ENVIRONMENT "development"
-    - mocha --reporter dot --MONGO_URI=$MONGO_URI_MOCHA --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY_MOCHA --PORT=$PORT_OPINION_MOCHA --ENVIRONMENT=test $DIST_PATH_OPINION
+    - pm2 start dist/Survey/index.js --name "survey" --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_OPINION "$FOREIGN_SERVICE_OPINION" --PORT "$PORT_SURVEY" --ENVIRONMENT "development"
+    - mocha --reporter dot --MONGO_URI=$MONGO_URI --FOREIGN_SERVICE_SURVEY=$FOREIGN_SERVICE_SURVEY --PORT=$PORT_OPINION --ENVIRONMENT=test $DIST_PATH_OPINION
     - pm2 kill
+
+building_and_pushing_mongo:
+  stage: build_and_push_docker
+  tags:
+    - dind
+    - docker
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  dependencies:
+    - build_local
+  before_script:
+    # python install
+    - apk update
+    - apk upgrade
+    - apk add util-linux pciutils usbutils coreutils binutils findutils grep
+    - apk add --no-cache curl jq python3 py3-pip
+    # AWS install
+    - pip install --upgrade awscli
+  script:
+    # use AWS
+    - echo Logging in to Amazon ECR...
+    - aws --version
+    - $(aws ecr get-login --region us-east-1 --no-include-email)
+    - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-mongo # uri of ECR
+    - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
+    # login to docker
+    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    # build
+    - echo build
+    - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile .
+    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
+    # push
+    - echo Build complete on `date`
+    - echo Pusching the Docker images...
+    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
+    - docker push $REPOSITORY_URI:latest
+    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    # write definitions file
+    - echo Writing image definitions file...
+    - printf '[{"name":"wp-ms-surveys-mongo-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
+  artifacts:
+    paths:
+      - imagedefinitions.json
+      - src/Mongo/docker-healthcheck
 
 building_and_pushing_survey:
   stage: build_and_push_docker
@@ -176,49 +217,3 @@ building_and_pushing_opinion:
   artifacts:
     paths:
       - imagedefinitions.json
-
-building_and_pushing_mongo:
-  stage: build_and_push_docker
-  tags:
-    - dind
-    - docker
-  image: docker:19.03.12
-  services:
-    - docker:19.03.12-dind
-  dependencies:
-    - build_local
-  before_script:
-    # python install
-    - apk update
-    - apk upgrade
-    - apk add util-linux pciutils usbutils coreutils binutils findutils grep
-    - apk add --no-cache curl jq python3 py3-pip
-    # AWS install
-    - pip install --upgrade awscli
-  script:
-    # use AWS
-    - echo Logging in to Amazon ECR...
-    - aws --version
-    - $(aws ecr get-login --region us-east-1 --no-include-email)
-    - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-mongo # uri of ECR
-    - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
-    # login to docker
-    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
-    # build
-    - echo build
-    - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile .
-    - echo "tag -> $REPOSITORY_URI:$IMAGE_TAG"
-    - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG # add another tag for aws to refer to a source image
-    # push
-    - echo Build complete on `date`
-    - echo Pusching the Docker images...
-    - echo "uri:tag -> $REPOSITORY_URI:$IMAGE_TAG"
-    - docker push $REPOSITORY_URI:latest
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
-    # write definitions file
-    - echo Writing image definitions file...
-    - printf '[{"name":"wp-ms-surveys-mongo-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
-  artifacts:
-    paths:
-      - imagedefinitions.json
-      - src/Mongo/docker-healthcheck
