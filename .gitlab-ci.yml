@@ -1,6 +1,8 @@
 variables:
   DOCKER_DRIVER: overlay2
   MONGODB_VERSION: "4.2"
+  DOCKER_VERSION: "19.03.12"
+  NODE_VERSION: "12.18.2-slim"
   MONGO_URI: mongodb://localhost:27017/wp-ms-surveys
   PORT_SURVEY: 8080
   PORT_OPINION: 8081
@@ -16,14 +18,14 @@ stages:
 
 services:
   - mongo:$MONGODB_VERSION
-  - docker:19.03.5-dind
+  - docker:$DOCKER_VERSION-dind
 
 cache:
   paths:
     - node_modules/
 
 build_local:
-  image: node:12.18.2-slim
+  image: node:$NODE_VERSION
   stage: build_local
   before_script:
     - npm install
@@ -41,12 +43,12 @@ build_local:
       - dist/
 
 testing_survey:
-  image: node:12.18.2-slim
+  image: node:$NODE_VERSION
   stage: test
   variables:
     NODE_ENV: test
   services:
-    - mongo:latest
+    - mongo:$MONGODB_VERSION
   dependencies:
     - build_local
   before_script:
@@ -62,10 +64,10 @@ testing_survey:
     - pm2 kill
 
 testing_opinion:
-  image: node:12.18.2-slim
+  image: node:$NODE_VERSION
   stage: test
   services:
-    - mongo:latest
+    - mongo:$MONGODB_VERSION
   dependencies:
     - build_local
   before_script:
@@ -85,9 +87,9 @@ building_and_pushing_mongo:
   tags:
     - dind
     - docker
-  image: docker:19.03.12
+  image: docker:$DOCKER_VERSION
   services:
-    - docker:19.03.12-dind
+    - docker:$DOCKER_VERSION-dind
   dependencies:
     - build_local
   before_script:
@@ -131,9 +133,9 @@ building_and_pushing_survey:
   tags:
     - dind
     - docker
-  image: docker:19.03.12
+  image: docker:$DOCKER_VERSION
   services:
-    - docker:19.03.12-dind
+    - docker:$DOCKER_VERSION-dind
   dependencies:
     - build_local
     - testing_survey
@@ -177,9 +179,9 @@ building_and_pushing_opinion:
   tags:
     - dind
     - docker
-  image: docker:19.03.12
+  image: docker:$DOCKER_VERSION
   services:
-    - docker:19.03.12-dind
+    - docker:$DOCKER_VERSION-dind
   dependencies:
     - build_local
     - testing_opinion
