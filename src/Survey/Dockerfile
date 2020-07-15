@@ -19,6 +19,8 @@ COPY src/Survey src/Survey
 
 RUN npm run build
 
+RUN npm install --save-prod
+
 EXPOSE "$PORT"
 
 ENV NODE_ENV "$ENVIRONMENT"

@@ -25,6 +25,6 @@ EXPOSE "$PORT"
 
 ENV NODE_ENV "$ENVIRONMENT"
 
-HEALTHCHECK CMD ["curl -f http://localhost:$PORT/opinion/health || exit 1"]
+#HEALTHCHECK CMD ["curl -f http://localhost:$PORT/opinion/health || exit 1"]
 
 CMD pm2 start dist/Opinion/index.js --name "opinion" --no-daemon --source-map-support -- --MONGO_URI "$MONGO_URI" --FOREIGN_SERVICE_SURVEY "$FOREIGN_SERVICE_SURVEY" --PORT "$PORT" --ENVIRONMENT "$ENVIRONMENT"
