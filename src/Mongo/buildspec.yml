@@ -28,4 +28,6 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"wp-ms-surveys-mongo-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json # create a file which helps the aws service to find the image
 artifacts:
-  files: imagedefinitions.json # add the created file to the docker image
+  files:
+    - imagedefinitions.json # add the created file to the docker image
+    - src/Mongo/docker-healthcheck
