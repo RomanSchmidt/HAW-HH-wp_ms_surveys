@@ -21,9 +21,9 @@ build_local:
   stage: build_local
   before_script:
     - npm install
-    - npm install source-map-support -g --save
+    #- npm install source-map-support -g --save
     - npm install typescript -g --save
-    - npm install ts-node -g --save
+    #- npm install ts-node -g --save
   script:
     - npm run build
   artifacts:
