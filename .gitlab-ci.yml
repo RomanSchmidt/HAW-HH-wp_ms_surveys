@@ -16,9 +16,9 @@ stages:
   - test
   - build_and_push_docker
 
-services:
-  - mongo:$MONGODB_VERSION
-  - docker:$DOCKER_VERSION-dind
+#services:
+  #- mongo:$MONGODB_VERSION
+  #- docker:$DOCKER_VERSION-dind
 
 cache:
   paths:
