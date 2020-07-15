@@ -21,9 +21,7 @@ build_local:
   stage: build_local
   before_script:
     - npm install
-    #- npm install source-map-support -g --save
     - npm install typescript -g --save
-    #- npm install ts-node -g --save
   script:
     - npm run build
   artifacts:
@@ -100,7 +98,7 @@ building_and_pushing_mongo:
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-mongo # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
     # login to docker
-    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    - aws ecr get-login-password | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
     # build
     - echo build
     - docker build -t $REPOSITORY_URI:latest -f ./src/Mongo/Dockerfile .
@@ -147,7 +145,7 @@ building_and_pushing_survey:
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-survey # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
     # login to docker
-    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    - aws ecr get-login-password | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
     # build
     - echo build
     - docker build -t $REPOSITORY_URI:latest -f ./src/Survey/Dockerfile . # build with with Dockerfile in Survey and set the latest tag
@@ -193,7 +191,7 @@ building_and_pushing_opinion:
     - REPOSITORY_URI=390532851048.dkr.ecr.us-east-2.amazonaws.com/wp-ms-surveys-opinion # uri of ECR
     - IMAGE_TAG=$(echo $CI_BUILD_REF | cut -c 1-7)
     # login to docker
-    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
+    - aws ecr get-login-password | docker login --username AWS --password-stdin "390532851048.dkr.ecr.us-east-2.amazonaws.com"
     # build
     - echo build
     - docker build -t $REPOSITORY_URI:latest -f ./src/Opinion/Dockerfile .
